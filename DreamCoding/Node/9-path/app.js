@@ -16,7 +16,7 @@ console.log(path.basename(__filename, '.js'));
 // dirname
 console.log(path.dirname(__filename));
 
-// extenstion
+// extension
 console.log(path.extname(__filename)); // 확장자 명
 
 // parse
