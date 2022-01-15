@@ -5,3 +5,5 @@ seongryong_lab
 build/
 dist/
 *.spec
+
+client/
