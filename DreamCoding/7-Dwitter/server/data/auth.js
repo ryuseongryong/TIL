@@ -2,8 +2,8 @@ let users = [
   {
     id: '1',
     username: 'bob',
-    password: '$2b$12$G9xf8SFq3oTEgdj7ozHQ/uhD0yeQcUEDU8tn0cvpvApuadr3nE5Vm',
-    // password: 'abcd1234',
+    password: '$2b$12$B2i8k/1mnnNGpP3g4PIHkuoZq78vrF6n45pZNAxQuwrqDhJqFGrnG',
+    // password: '12345',
     name: 'Bob',
     email: 'bob@gmail.com',
     url: 'https://m.media-amazon.com/images/M/MV5BNzg0MWEyZjItOTZlMi00YmRjLWEyYzctODIwMDU0OThiMzNkXkEyXkFqcGdeQXVyNjUxMjc1OTM@._V1_UY317_CR13,0,214,317_AL_.jpg',
