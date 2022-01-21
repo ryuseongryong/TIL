@@ -1,31 +1,52 @@
-//     username: 'bob',
-//     url: 'https://m.media-amazon.com/images/M/MV5BNzg0MWEyZjItOTZlMi00YmRjLWEyYzctODIwMDU0OThiMzNkXkEyXkFqcGdeQXVyNjUxMjc1OTM@._V1_UY317_CR13,0,214,317_AL_.jpg',
-//     username: 'seongryong',
-//     url: 'https://avatars.githubusercontent.com/u/58920833?s=400&u=ac2997091b3a84b129630b576fddccaaadabecc4&v=4',
+/* 
+'bob' : 'https://m.media-amazon.com/images/M/MV5BNzg0MWEyZjItOTZlMi00YmRjLWEyYzctODIwMDU0OThiMzNkXkEyXkFqcGdeQXVyNjUxMjc1OTM@._V1_UY317_CR13,0,214,317_AL_.jpg'
+'seongryong' : 'https://avatars.githubusercontent.com/u/58920833?s=400&u=ac2997091b3a84b129630b576fddccaaadabecc4&v=4' 
+*/
+import SQ from 'sequelize';
+import { sequelize } from '../db/database.js';
 
-import { db } from '../db/database.js';
+const DataTypes = SQ.DataTypes;
+
+export const User = sequelize.define(
+  'user',
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      allowNull: false,
+      primaryKey: true,
+    },
+    username: {
+      type: DataTypes.STRING(45),
+      allowNull: false,
+    },
+    password: {
+      type: DataTypes.STRING(128),
+      allowNull: false,
+    },
+    name: {
+      type: DataTypes.STRING(128),
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING(128),
+      allowNull: false,
+    },
+    url: DataTypes.TEXT,
+  },
+  {
+    timestamps: false,
+  }
+);
 
 export async function findByUsername(username) {
-  return db
-    .execute('SELECT * FROM users WHERE username=?', [username])
-    .then((result) => result[0][0]);
+  return User.findOne({ where: { username } });
 }
 
 export async function findById(id) {
-  return db
-    .execute('SELECT * FROM users WHERE id=?', [id])
-    .then((result) => result[0][0]);
+  return User.findByPk(id);
 }
 
 export async function createUser(user) {
-  const { username, password, name, email, url } = user;
-  return db
-    .execute(
-      'INSERT INTO users (username, password, name, email, url) VALUES (?, ?, ?, ?, ?)',
-      [username, password, name, email, url]
-    )
-    .then((result) => {
-      console.log(result[0].insertId);
-      return result;
-    });
+  return User.create(user).then((data) => data.dataValues.id);
 }
