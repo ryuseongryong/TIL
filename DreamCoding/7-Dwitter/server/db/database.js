@@ -3,7 +3,10 @@ import { config } from '../config.js';
 
 let db;
 export async function connectDB() {
-  return MongoDB.MongoClient.connect(config.db.host) //
+  return MongoDB.MongoClient.connect(config.db.host, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }) //
     .then((client) => {
       db = client.db();
     });
