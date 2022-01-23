@@ -10,9 +10,14 @@ import { initSocket } from './connection/socket.js';
 import { sequelize } from './db/database.js';
 
 const app = express();
+const corsOption = {
+  origin: config.cors.allowedOrigin,
+  optionsSuccessStatus: 200,
+};
+
 app.use(express.json());
 app.use(helmet());
-app.use(cors());
+app.use(cors(corsOption));
 app.use(morgan('tiny'));
 
 app.use('/tweets', tweetsRouter);
@@ -31,7 +36,11 @@ sequelize
   .sync()
   //.then((client) => console.log(client));
   .then(() => {
-    const server = app.listen(config.host.port);
+    const server = app.listen(config.port);
     initSocket(server);
-    console.log(`app is listen PORT : ${config.host.port}...`);
+    console.log(
+      `Server is started...\n\rPORT: ${
+        config.port
+      }\n\rdate: ${new Date().toLocaleString()}`
+    );
   });
