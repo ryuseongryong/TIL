@@ -8,3 +8,6 @@ dist/
 
 client/
 **/node_modules/
+
+platform.sh
+platform.sh.pub
