@@ -22,6 +22,7 @@ export const isAuth = async (req, res, next) => {
       return res.status(401).json(AUTH_ERROR);
     }
     req.userId = user.id; // req.customData를 등록하고 다음 순위로 넘길 수 있음
+    req.token = token;
     next();
   });
 };
