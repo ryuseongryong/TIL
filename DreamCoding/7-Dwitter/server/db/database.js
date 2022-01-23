@@ -1,20 +1,24 @@
-import MongoDB from 'mongodb';
+import Mongoose from 'mongoose';
 import { config } from '../config.js';
 
-let db;
 export async function connectDB() {
-  return MongoDB.MongoClient.connect(config.db.host, {
+  return Mongoose.connect(config.db.host, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-  }) //
-    .then((client) => {
-      db = client.db();
-    });
+    // Mongoose 6.X~ default option
+    // useFindAndModify: false,
+  });
 }
 
-export function getUsers() {
-  return db.collection('users');
+export function useVirtualId(schema) {
+  // _id -> id
+  schema.virtual('id').get(function () {
+    return this._id.toString();
+  });
+  schema.set('toJSON', { virtuals: true });
+  schema.set('toObject', { virtuals: true });
 }
+let db;
 
 export function getTweets() {
   return db.collection('tweets');
