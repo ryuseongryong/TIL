@@ -11,3 +11,5 @@ client/
 
 platform.sh
 platform.sh.pub
+# Local Netlify folder
+.netlify

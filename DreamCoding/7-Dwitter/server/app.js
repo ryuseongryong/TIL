@@ -7,7 +7,7 @@ import tweetsRouter from './router/tweet.js';
 import authRouter from './router/auth.js';
 import { config } from './config.js';
 import { initSocket } from './connection/socket.js';
-import { connectDB } from './db/database.js';
+import { sequelize } from './db/database.js';
 
 const app = express();
 const corsOption = {
@@ -32,7 +32,9 @@ app.use((error, req, res, next) => {
   res.sendStatus(500);
 });
 
-connectDB()
+sequelize
+  .sync()
+  //.then((client) => console.log(client));
   .then(() => {
     const server = app.listen(config.port);
     initSocket(server);
@@ -40,4 +42,3 @@ connectDB()
       `Server is started...\n\rPORT: ${config.port}\n\rdate: ${new Date()}`
     );
   });
-
