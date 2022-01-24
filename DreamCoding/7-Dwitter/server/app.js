@@ -39,8 +39,6 @@ sequelize
     const server = app.listen(config.port);
     initSocket(server);
     console.log(
-      `Server is started...\n\rPORT: ${
-        config.port
-      }\n\rdate: ${new Date().toLocaleString()}`
+      `Server is started...\n\rPORT: ${config.port}\n\rdate: ${new Date()}`
     );
   });

@@ -23,7 +23,8 @@ export const config = {
     host: required('DB_HOST'),
     user: required('DB_USER'),
     database: required('DB_DATABASE'),
-    password: required('DB_PASSWORD'),
+    // password: required('DB_PASSWORD', null),
+    password: null,
   },
   port: parseInt(required('PORT', 8080)),
   cors: {
