@@ -24,7 +24,7 @@ export const config = {
     user: required('DB_USER'),
     database: required('DB_DATABASE'),
     password: required('DB_PASSWORD'),
-    port: required('DB_PORT'),
+    // port: required('DB_PORT'),
     // password: null,
   },
   port: parseInt(required('PORT', 8080)),
