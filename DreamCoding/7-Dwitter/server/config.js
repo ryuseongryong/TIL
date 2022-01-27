@@ -16,6 +16,9 @@ export const config = {
   bcrypt: {
     saltRounds: parseInt(required('BCRYPT_SALT_ROUNDS', 12)),
   },
+  csrf: {
+    plainToken: required('CSRF_SECRET_KEY'),
+  },
   host: {
     port: parseInt(required('HOST_PORT', 8080)),
   },
