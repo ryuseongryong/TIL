@@ -34,4 +34,8 @@ export const config = {
   cors: {
     allowedOrigin: required('CORS_ALLOW_ORIGIN'),
   },
+  rateLimit: {
+    windowMs: 1000,
+    maxRequest: 10,
+  },
 };
