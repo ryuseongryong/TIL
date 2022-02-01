@@ -15,6 +15,7 @@ import { sequelize } from './db/database.js';
 import { csrfCheck } from './middleware/csrf.js';
 import rateLimit from './middleware/rate-limiter.js';
 import * as apis from './controller/index.js';
+import { modulePathResolver } from 'express-openapi-validator/dist/resolvers';
 
 const app = express();
 const corsOption = {
@@ -36,13 +37,33 @@ app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(openAPIDocument));
 app.use('/tweets', tweetsRouter);
 app.use('/auth', authRouter);
 
+app.use(
+  // routing + validation(set standard in yaml file)
+  OpenAPIValidator.middleware({
+    apiSpec: './api/openapi.yaml',
+    validateResponses: true,
+    operationHandlers: {
+      resolver: modulePathResolver,
+    },
+  })
+);
+
+function modulePathResolver(_, route, apiDoc) {
+  const pathKey = route.openApiRoute.substring(route.basePath.length);
+  const operation = apiDoc.paths[pathKey][route.method.toLowerCase()];
+  const methodName = operation.operationId;
+  return apis[methodName];
+}
+
 app.use((req, res, next) => {
   res.sendStatus(404);
 });
 
 app.use((error, req, res, next) => {
   console.error(error);
-  res.sendStatus(500);
+  res.status(error.status || 500).json({
+    message: error.message,
+  });
 });
 
 sequelize
