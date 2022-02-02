@@ -37,7 +37,7 @@ const INCLUDE_USER = {
 const ORDER_DESC = { order: [['createdAt', 'DESC']] };
 
 export async function getAll() {
-  return Tweet.findAll({ ...INCLUDE_USER, ...ORDER_DESC });
+  return Tweet.findAll({ ...INCLUDE_USER, ...ORDER_DESC, raw: true });
 }
 
 export async function getAllByUsername(username) {
@@ -48,6 +48,7 @@ export async function getAllByUsername(username) {
       ...INCLUDE_USER.include,
       where: { username },
     },
+    raw: true,
   });
 }
 

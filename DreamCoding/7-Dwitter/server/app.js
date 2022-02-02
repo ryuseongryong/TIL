@@ -14,8 +14,8 @@ import { initSocket } from './connection/socket.js';
 import { sequelize } from './db/database.js';
 import { csrfCheck } from './middleware/csrf.js';
 import rateLimit from './middleware/rate-limiter.js';
+import { authHandler } from './middleware/auth.js';
 import * as apis from './controller/index.js';
-import { modulePathResolver } from 'express-openapi-validator/dist/resolvers';
 
 const app = express();
 const corsOption = {
@@ -32,7 +32,7 @@ app.use(cors(corsOption));
 app.use(morgan('tiny'));
 app.use(rateLimit);
 
-app.use(csrfCheck);
+// app.use(csrfCheck);
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(openAPIDocument));
 app.use('/tweets', tweetsRouter);
 app.use('/auth', authRouter);
@@ -44,6 +44,11 @@ app.use(
     validateResponses: true,
     operationHandlers: {
       resolver: modulePathResolver,
+    },
+    validateSecurity: {
+      handlers: {
+        jwt_auth: authHandler,
+      },
     },
   })
 );
