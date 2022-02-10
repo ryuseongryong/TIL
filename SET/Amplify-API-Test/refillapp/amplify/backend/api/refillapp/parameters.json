@@ -1,0 +1,5 @@
+{
+  "AppSyncApiName": "refillapp",
+  "DynamoDBBillingMode": "PAY_PER_REQUEST",
+  "DynamoDBEnableServerSideEncryption": false
+}
