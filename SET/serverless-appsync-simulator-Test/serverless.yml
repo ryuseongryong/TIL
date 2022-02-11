@@ -1,0 +1,9 @@
+service: ${self:custom.ingkle}-api-app
+
+plugins:
+  - serverless-python-requirements
+  - serverless-appsync-plugin
+  - serverless-plugin-split-stacks
+  - serverless-dynamodb-local
+  - serverless-appsync-simulator
+  - serverless-offline
