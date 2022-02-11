@@ -109,3 +109,68 @@ function_name()
 #         move()
 #     while wall_in_front():
 #         jump()
+
+# Robot World 4
+# def turn_right():
+#     turn_left()
+#     turn_left()
+#     turn_left()
+
+# def jump():
+#     turn_left()
+#     while wall_on_right() and front_is_clear():
+#         move()
+#         if at_goal():
+#             break
+#     while right_is_clear():
+#         turn_right()
+#         move()
+#         if at_goal():
+#             break
+# while not at_goal():
+#     while front_is_clear():
+#         move()
+#     while wall_in_front():
+#         jump()
+#
+# Maze ver1.
+# def turn_right():
+#     turn_left()
+#     turn_left()
+#     turn_left()
+
+# while not at_goal():
+#     while front_is_clear():
+#         if at_goal():
+#             break
+#         if wall_on_right():
+#             move()
+#         elif right_is_clear():
+#             turn_right()
+#             move()
+#     while wall_in_front():
+#         if at_goal():
+#             break
+#         if wall_on_right():
+#             turn_left()
+#         elif right_is_clear():
+#             turn_right()
+#             move()
+# Maze ver2.
+# def turn_right():
+#     turn_left()
+#     turn_left()
+#     turn_left()
+
+# while front_is_clear():
+#     move()
+# turn_left()
+
+# while not at_goal():
+#     if right_is_clear():
+#         turn_right()
+#         move()
+#     elif front_is_clear():
+#         move()
+#     else:
+#         turn_left()
