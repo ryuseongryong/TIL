@@ -2,9 +2,9 @@
 #
 # hanman 1
 from replit import clear
-import hangman_words
-import hangman_art
 import random
+from lib import hangman_art, hangman_words
+
 # Step 1
 
 word_list = ["ardvark", "baboon", "camel"]
