@@ -15,5 +15,11 @@
         }
       }
     }
+  },
+  "storage": {
+    "dynamoTest123": {
+      "service": "DynamoDB",
+      "providerPlugin": "awscloudformation"
+    }
   }
 }

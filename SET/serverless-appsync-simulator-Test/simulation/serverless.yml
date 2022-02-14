@@ -1,0 +1,22 @@
+service: test-serverless-appsync-simulation
+
+plugins:
+  - serverless-python-requirements
+  - serverless-appsync-plugin
+  - serverless-plugin-split-stacks
+  - serverless-dynamodb-local
+  - serverless-appsync-simulator
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: python3.7
+  memorySize: 1024
+  region: ap-northeast-2
+
+custom:
+  appsync-simulator:
+    location: '.'
+# fucntions:
+#   main:
+#     handler:
