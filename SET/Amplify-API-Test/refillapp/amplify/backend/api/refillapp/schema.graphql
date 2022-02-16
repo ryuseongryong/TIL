@@ -7,6 +7,7 @@ type Todo @model {
   id: ID!
   name: String!
   description: String
+  factOfTheDay: String @function(name: "factOfTheDay-${env}")
 }
 
 type RefillLocation @model {

@@ -17,9 +17,27 @@
     }
   },
   "storage": {
-    "dynamoTest123": {
+    "dynamoNoSQL": {
       "service": "DynamoDB",
       "providerPlugin": "awscloudformation"
+    }
+  },
+  "function": {
+    "factOfTheDay": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "storage",
+          "resourceName": "dynamoNoSQL",
+          "attributes": [
+            "Name",
+            "Arn",
+            "StreamArn"
+          ]
+        }
+      ]
     }
   }
 }
