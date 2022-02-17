@@ -1,0 +1,16 @@
+{
+  "resourceName": "dynamoNoSQL",
+  "tableName": "DTable",
+  "partitionKey": {
+    "fieldName": "DCol",
+    "fieldType": "number"
+  },
+  "sortKey": {
+    "fieldName": "FactOfDay",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": [
+    "factOfTheDay"
+  ]
+}

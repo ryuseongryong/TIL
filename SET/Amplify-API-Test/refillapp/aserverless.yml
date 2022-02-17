@@ -1,0 +1,13 @@
+service: refillapp
+
+provider:
+  name: aws
+  runtime: python3.6
+  stage: dev
+  stackName: refillapp-dev
+  profile: ryuseongryong-dev
+  lambdaLayerStackName: ryuseongryong-lambda-layer-dev
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - 'cognito-identity:*'

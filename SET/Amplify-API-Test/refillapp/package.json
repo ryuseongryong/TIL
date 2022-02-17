@@ -36,5 +36,12 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "serverless-appsync-plugin": "^1.12.1",
+    "serverless-appsync-simulator": "^0.19.6",
+    "serverless-dynamodb-local": "^0.2.40",
+    "serverless-offline": "^8.4.0",
+    "serverless-python-requirements": "^5.3.1"
   }
 }
