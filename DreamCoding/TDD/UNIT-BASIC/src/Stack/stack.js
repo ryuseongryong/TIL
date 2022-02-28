@@ -15,6 +15,14 @@ class Stack {
     if (this.array.length === 0) {
       throw new Error('empty array');
     }
+    return this.array.pop();
+  }
+
+  peek() {
+    if (this.array.length === 0) {
+      throw new Error('empty array');
+    }
+    return this.array.slice(-1)[0];
   }
 }
 
