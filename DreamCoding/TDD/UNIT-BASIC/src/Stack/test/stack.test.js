@@ -1,57 +1,60 @@
-const Stack = require('../stack.js');
+const Stack = require("../stack.js");
 
-describe('Stack', () => {
+describe("Stack", () => {
   let stack;
 
   beforeEach(() => {
     stack = new Stack();
   });
 
-  it('new stack is empty', () => {
+  it("new stack is empty", () => {
     expect(stack.size()).toBe(0);
   });
 
-  it('push function can input to array new element', () => {
-    stack.push('new element');
+  it("push function can input to array new element", () => {
+    const item = stack.push("new element");
 
     expect(stack.size()).toBe(1);
-    expect(stack.array).toEqual(['new element']);
+    expect(stack.head.item).toEqual("new element");
     // expect(stack.array).toContainEqual('new element');
   });
 
-  describe('pop', () => {
-    it('throw error, when pop empty array', () => {
+  describe("pop", () => {
+    it("throw error, when pop empty array", () => {
       expect(() => {
         stack.pop();
-      }).toThrow('empty array');
+      }).toThrow("empty array");
     });
 
-    it('return last element and remove', () => {
-      stack.push('first');
-      stack.push('second');
+    it("return last element and remove", () => {
+      stack.push("first");
+      stack.push("second");
 
       const removeElement = stack.pop();
-      expect(removeElement).toBe('second');
+      expect(removeElement).toBe("second");
       expect(stack.size()).toBe(1);
-      expect(stack.array).toEqual(['first']);
+      expect(stack.head.item).toEqual("first");
     });
   });
 
-  describe('peek', () => {
-    it('throw error, when pop empty array', () => {
+  describe("peek", () => {
+    it("throw error, when pop empty array", () => {
       expect(() => {
         stack.pop();
-      }).toThrow('empty array');
+      }).toThrow("empty array");
     });
 
-    it('return last element but maintain', () => {
-      stack.push('first');
-      stack.push('second');
+    it("return last element but maintain", () => {
+      stack.push("first");
+      stack.push("second");
 
       const maintainElement = stack.peek();
-      expect(maintainElement).toBe('second');
+      expect(maintainElement).toBe("second");
       expect(stack.size()).toBe(2);
-      expect(stack.array).toEqual(['first', 'second']);
+      expect([stack.head.next.item, stack.head.item]).toEqual([
+        "first",
+        "second",
+      ]);
     });
   });
 });
