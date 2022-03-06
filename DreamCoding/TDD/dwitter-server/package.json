@@ -5,7 +5,7 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --watchAll --verbose",
     "start": "nodemon app"
   },
   "author": "Dream Coding Academy",
@@ -25,6 +25,9 @@
     "socket.io": "^4.1.2"
   },
   "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.16.8",
+    "jest": "^27.5.1",
+    "node-mocks-http": "^1.11.0",
     "nodemon": "^2.0.7"
   }
 }
