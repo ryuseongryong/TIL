@@ -1,54 +1,59 @@
-import * as tweetRepository from '../data/tweet.js';
-import { getSocketIO } from '../connection/socket.js';
-
-export async function getTweets(req, res) {
-  const username = req.query.username;
-  const data = await (username
-    ? tweetRepository.getAllByUsername(username)
-    : tweetRepository.getAll());
-  res.status(200).json(data);
-}
-
-export async function getTweet(req, res, next) {
-  const id = req.params.id;
-  const tweet = await tweetRepository.getById(id);
-  if (tweet) {
-    res.status(200).json(tweet);
-  } else {
-    res.status(404).json({ message: `Tweet id(${id}) not found` });
+export class TweetController {
+  constructor(tweetRepository, getSocket) {
+    this.tweets = tweetRepository;
+    this.getSocket = getSocket;
   }
-}
 
-export async function createTweet(req, res, next) {
-  const { text } = req.body;
-  const tweet = await tweetRepository.create(text, req.userId);
-  res.status(201).json(tweet);
-  getSocketIO().emit('tweets', tweet);
-}
+  // arrow function으로 this binding 적용 가능
+  getTweets = async (req, res) => {
+    const username = req.query.username;
+    const data = await (username
+      ? this.tweets.getAllByUsername(username)
+      : this.tweets.getAll());
+    res.status(200).json(data);
+  };
 
-export async function updateTweet(req, res, next) {
-  const id = req.params.id;
-  const text = req.body.text;
-  const tweet = await tweetRepository.getById(id);
-  if (!tweet) {
-    return res.status(404).json({ message: `Tweet not found: ${id}` });
-  }
-  if (tweet.userId !== req.userId) {
-    return res.sendStatus(403);
-  }
-  const updated = await tweetRepository.update(id, text);
-  res.status(200).json(updated);
-}
+  getTweet = async (req, res, next) => {
+    const id = req.params.id;
+    const tweet = await this.tweets.getById(id);
+    if (tweet) {
+      res.status(200).json(tweet);
+    } else {
+      res.status(404).json({ message: `Tweet id(${id}) not found` });
+    }
+  };
 
-export async function deleteTweet(req, res, next) {
-  const id = req.params.id;
-  const tweet = await tweetRepository.getById(id);
-  if (!tweet) {
-    return res.status(404).json({ message: `Tweet not found: ${id}` });
-  }
-  if (tweet.userId !== req.userId) {
-    return res.sendStatus(403);
-  }
-  await tweetRepository.remove(id);
-  res.sendStatus(204);
+  createTweet = async (req, res, next) => {
+    const { text } = req.body;
+    const tweet = await this.tweets.create(text, req.userId);
+    res.status(201).json(tweet);
+    this.getSocket().emit("tweets", tweet);
+  };
+
+  updateTweet = async (req, res, next) => {
+    const id = req.params.id;
+    const text = req.body.text;
+    const tweet = await this.tweets.getById(id);
+    if (!tweet) {
+      return res.status(404).json({ message: `Tweet not found: ${id}` });
+    }
+    if (tweet.userId !== req.userId) {
+      return res.sendStatus(403);
+    }
+    const updated = await this.tweets.update(id, text);
+    res.status(200).json(updated);
+  };
+
+  deleteTweet = async (req, res, next) => {
+    const id = req.params.id;
+    const tweet = await this.tweets.getById(id);
+    if (!tweet) {
+      return res.status(404).json({ message: `Tweet not found: ${id}` });
+    }
+    if (tweet.userId !== req.userId) {
+      return res.sendStatus(403);
+    }
+    await this.tweets.remove(id);
+    res.sendStatus(204);
+  };
 }
