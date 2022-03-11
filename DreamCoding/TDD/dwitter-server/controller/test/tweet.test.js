@@ -122,4 +122,64 @@ describe("Tweet Controller", () => {
       });
     });
   });
+
+  describe("updateTweet", () => {
+    let tweetId, updatedText, req, res, authorId;
+    beforeEach(() => {
+      tweetId = faker.random.alphaNumeric(16);
+      updatedText = faker.random.words(3);
+      authorId = faker.random.alphaNumeric(16);
+      req = httpMocks.createRequest({
+        params: { id: tweetId },
+        body: { text: updatedText },
+        userId: authorId,
+      });
+      res = httpMocks.createResponse();
+    });
+
+    it("updates the repository and return 200", async () => {
+      tweetRepository.getById = () => {
+        return {
+          text: faker.random.words(3),
+          userId: authorId,
+        };
+      };
+      tweetRepository.update = (tweetId, newTweet) => {
+        return { text: newTweet };
+      };
+
+      await tweetController.updateTweet(req, res);
+
+      expect(res.statusCode).toBe(200);
+      expect(res._getJSONData()).toMatchObject({
+        text: updatedText,
+      });
+    });
+
+    it("returns 403 and should not update the repository if the tweet does not belong", async () => {
+      tweetRepository.getById = () => {
+        return {
+          text: faker.random.words(3),
+          userId: faker.random.alphaNumeric(16),
+        };
+      };
+      tweetRepository.update = jest.fn();
+
+      await tweetController.updateTweet(req, res);
+
+      expect(res.statusCode).toBe(403);
+    });
+
+    it("returns 404 and should not update the repository if the tweet does not exist", async () => {
+      tweetRepository.getById = () => undefined;
+      tweetRepository.update = jest.fn();
+
+      await tweetController.updateTweet(req, res);
+
+      expect(res.statusCode).toBe(404);
+      expect(res._getJSONData()).toMatchObject({
+        message: `Tweet not found: ${tweetId}`,
+      });
+    });
+  });
 });
