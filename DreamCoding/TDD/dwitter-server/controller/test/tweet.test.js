@@ -182,4 +182,60 @@ describe("Tweet Controller", () => {
       });
     });
   });
+
+  describe("deleteTweet", () => {
+    let tweetId, req, res, authorId;
+
+    beforeEach(() => {
+      tweetId = faker.random.alphaNumeric(16);
+      authorId = faker.random.alphaNumeric(16);
+      req = httpMocks.createRequest({
+        params: { id: tweetId },
+        userId: authorId,
+      });
+      res = httpMocks.createResponse();
+    });
+
+    it("returns 204 and remove the tweet from the repository if the tweet exists", async () => {
+      tweetRepository.getById = () => {
+        return {
+          userId: authorId,
+        };
+      };
+      tweetRepository.remove = jest.fn();
+
+      await tweetController.deleteTweet(req, res);
+
+      expect(res.statusCode).toBe(204);
+      expect(tweetRepository.remove).toHaveBeenCalledWith(tweetId);
+    });
+
+    it("returns 403 and should not update the repository if the tweet does not belong to the user", async () => {
+      tweetRepository.getById = () => {
+        return {
+          userId: faker.random.alphaNumeric(16),
+        };
+      };
+
+      tweetRepository.remove = jest.fn();
+
+      await tweetController.deleteTweet(req, res);
+
+      expect(res.statusCode).toBe(403);
+      expect(tweetRepository.remove).not.toHaveBeenCalled();
+    });
+
+    it("returns 404 and should not update the repository if the tweet does not exist", async () => {
+      tweetRepository.getById = () => undefined;
+      tweetRepository.remove = jest.fn();
+
+      await tweetController.deleteTweet(req, res);
+
+      expect(res.statusCode).toBe(404);
+      expect(res._getJSONData()).toMatchObject({
+        message: `Tweet not found: ${tweetId}`,
+      });
+      expect(tweetRepository.remove).not.toHaveBeenCalled();
+    });
+  });
 });
