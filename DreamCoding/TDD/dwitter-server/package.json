@@ -2,11 +2,11 @@
   "name": "dwitter",
   "version": "1.0.0",
   "description": "twitter clone coding - simple version",
-  "main": "app.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
     "test": "DOTENV_CONFIG_PATH=./.env.test jest --watchAll --verbose",
-    "start": "nodemon app"
+    "start": "nodemon index"
   },
   "author": "Dream Coding Academy",
   "license": "ISC",
@@ -28,6 +28,7 @@
     "@babel/plugin-transform-modules-commonjs": "^7.16.8",
     "@faker-js/faker": "^6.0.0-alpha.7",
     "@types/jest": "^27.4.1",
+    "axios": "^0.26.1",
     "jest": "^27.5.1",
     "node-mocks-http": "^1.11.0",
     "nodemon": "^2.0.7"

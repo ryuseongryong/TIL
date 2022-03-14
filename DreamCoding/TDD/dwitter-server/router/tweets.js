@@ -30,4 +30,5 @@ export default function tweetsRouter(tweetController) {
 
   // DELETE /tweets/:id
   router.delete("/:id", isAuth, tweetController.deleteTweet);
+  return router;
 }
