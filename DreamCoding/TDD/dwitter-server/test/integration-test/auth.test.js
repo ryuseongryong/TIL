@@ -20,21 +20,39 @@ describe("Auth APIs", () => {
     await stopServer(server);
   });
 
+  // contorller/auth.signup에 대한 것
   describe("POST to /auth/signup", () => {
     it("returns 201 and authorization token when user details are valid", async () => {
-      const fakerUser = faker.helpers.userCard();
-      const { name, username, email } = fakerUser;
-      const user = {
-        name,
-        username,
-        email,
-        password: faker.internet.password(10, true),
-      };
+      const fakerUser = makeValidUserDetails();
 
-      const res = await req.post("/auth/signup", user);
+      const res = await req.post("/auth/signup", fakerUser);
 
       expect(res.status).toBe(201);
       expect(res.data.token.length).toBeGreaterThan(0);
     });
+
+    it("returns 409 when username has already been taken", async () => {
+      const fakerUser = makeValidUserDetails();
+
+      const firstSignup = await req.post("/auth/signup", fakerUser);
+      expect(firstSignup.status).toBe(201);
+      const secondSignup = await req.post("/auth/signup", fakerUser);
+      expect(secondSignup.status).toBe(409);
+      expect(secondSignup.data.message).toBe(
+        `${fakerUser.username} already exists`
+      );
+    });
   });
 });
+
+function makeValidUserDetails() {
+  const fakerUser = faker.helpers.userCard();
+  const { name, username, email } = fakerUser;
+  const user = {
+    name,
+    username,
+    email,
+    password: faker.internet.password(10, true),
+  };
+  return user;
+}
