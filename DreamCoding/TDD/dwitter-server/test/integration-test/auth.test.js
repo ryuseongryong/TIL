@@ -42,6 +42,44 @@ describe("Auth APIs", () => {
         `${fakerUser.username} already exists`
       );
     });
+
+    test.each([
+      { missingFieldName: "name", expectedMessage: "name is missing" },
+      {
+        missingFieldName: "username",
+        expectedMessage: "username should be at least 5 characters",
+      },
+      {
+        missingFieldName: "email",
+        expectedMessage: "invalid email",
+      },
+      {
+        missingFieldName: "password",
+        expectedMessage: "password should be at least 5 characters",
+      },
+    ])(
+      `returns 400 when $missingFieldName field is missing`,
+      async ({ missingFieldName, expectedMessage }) => {
+        const fakerUser = makeValidUserDetails();
+        delete fakerUser[missingFieldName];
+        const res = await req.post("/auth/signup", fakerUser);
+
+        expect(res.status).toBe(400);
+        expect(res.data.message).toBe(expectedMessage);
+      }
+    );
+
+    it("returns 400 when password is too short", async () => {
+      const fakerUser = {
+        ...makeValidUserDetails(),
+        password: "123",
+      };
+
+      const res = await req.post("/auth/signup", fakerUser);
+
+      expect(res.status).toBe(400);
+      expect(res.data.message).toBe("password should be at least 5 characters");
+    });
   });
 });
 
