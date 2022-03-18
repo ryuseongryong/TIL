@@ -81,6 +81,51 @@ describe("Auth APIs", () => {
       expect(res.data.message).toBe("password should be at least 5 characters");
     });
   });
+
+  describe("POST to /auth/login", () => {
+    it("returns 200 and authorization token when user credentials are valid", async () => {
+      const fakerUser = await createNewUserAccount();
+
+      const res = await req.post("/auth/login", {
+        username: fakerUser.username,
+        password: fakerUser.password,
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.data.token.length).toBeGreaterThan(0);
+    });
+    it("returns 401 when password is incorrect", async () => {
+      const fakerUser = await createNewUserAccount();
+
+      const res = await req.post("/auth/login", {
+        username: fakerUser.username,
+        password: faker.internet.password(9),
+      });
+
+      expect(res.status).toBe(401);
+      expect(res.data).toMatchObject({ message: "Invalid user or password" });
+    });
+    it("returns 401 when username is not found", async () => {
+      const fakerUser = await createNewUserAccount();
+
+      const res = await req.post("/auth/login", {
+        username: faker.internet.userName(),
+        password: fakerUser.password,
+      });
+
+      expect(res.status).toBe(401);
+      expect(res.data).toMatchObject({ message: "Invalid user or password" });
+    });
+  });
+
+  async function createNewUserAccount() {
+    const userDetails = makeValidUserDetails();
+    const prepareUserRes = await req.post("/auth/signup", userDetails);
+    return {
+      ...userDetails,
+      jwt: prepareUserRes.data.token,
+    };
+  }
 });
 
 function makeValidUserDetails() {
