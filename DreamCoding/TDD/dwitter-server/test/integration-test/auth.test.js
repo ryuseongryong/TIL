@@ -118,6 +118,22 @@ describe("Auth APIs", () => {
     });
   });
 
+  describe("GET to /auth/me", () => {
+    it("returns user details when valid token is present in Authorization header", async () => {
+      const fakerUser = await createNewUserAccount();
+
+      const res = await req.get("/auth/me", {
+        headers: { Authorization: `Bearer ${fakerUser.jwt}` },
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.data).toMatchObject({
+        username: fakerUser.username,
+        token: fakerUser.jwt,
+      });
+    });
+  });
+
   async function createNewUserAccount() {
     const userDetails = makeValidUserDetails();
     const prepareUserRes = await req.post("/auth/signup", userDetails);
