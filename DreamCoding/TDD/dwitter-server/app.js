@@ -9,7 +9,9 @@ import { config } from "./config.js";
 import { initSocket, getSocketIO } from "./connection/socket.js";
 import { sequelize } from "./db/database.js";
 import { TweetController } from "./controller/tweet.js";
+import { AuthController } from "./controller/auth.js";
 import * as tweetRepository from "./data/tweet.js";
+import * as userRepository from "./data/auth.js";
 
 const corsOption = {
   origin: config.cors.allowedOrigin,
@@ -28,7 +30,7 @@ export async function startServer() {
     "/tweets",
     tweetsRouter(new TweetController(tweetRepository, getSocketIO))
   );
-  app.use("/auth", authRouter);
+  app.use("/auth", authRouter(new AuthController(userRepository, config)));
 
   app.use((req, res, next) => {
     res.sendStatus(404);
