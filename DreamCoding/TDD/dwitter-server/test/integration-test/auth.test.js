@@ -142,6 +142,48 @@ describe("Auth APIs", () => {
       jwt: prepareUserRes.data.token,
     };
   }
+
+  describe("Tweets APIs", () => {
+    describe("GET /tweets", () => {});
+    describe("GET /tweets/:id", () => {});
+    describe("POST /tweets", () => {
+      it("returns 201 and the created tweet when a tweet text is 3 characters or more", async () => {
+        const text = faker.random.words(3);
+        const fakerUser = await createNewUserAccount();
+
+        const res = await req.post(
+          "/tweets",
+          { text },
+          { headers: { Authorization: `Bearer ${fakerUser.jwt}` } }
+        );
+
+        expect(res.status).toBe(201);
+        expect(res.data).toMatchObject({
+          name: fakerUser.name,
+          username: fakerUser.username,
+          text,
+        });
+      });
+
+      it("returns 400 when a tweet text is less than 3 characters", async () => {
+        const text = faker.random.alpha({ count: 2 });
+        const fakerUser = await createNewUserAccount();
+
+        const res = await req.post(
+          "/tweets",
+          { text },
+          { headers: { Authorization: `Bearer ${fakerUser.jwt}` } }
+        );
+
+        expect(res.status).toBe(400);
+        expect(res.data.message).toMatch(
+          "text should be at least 3 characters"
+        );
+      });
+    });
+    describe("PUT /tweets/:id", () => {});
+    describe("DELETE /tweets/:id", () => {});
+  });
 });
 
 function makeValidUserDetails() {
