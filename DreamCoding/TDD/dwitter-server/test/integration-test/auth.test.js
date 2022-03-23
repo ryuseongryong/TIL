@@ -144,7 +144,45 @@ describe("Auth APIs", () => {
   }
 
   describe("Tweets APIs", () => {
-    describe("GET /tweets", () => {});
+    describe("GET /tweets", () => {
+      it("returns all tweets when username is not specified in the query", async () => {
+        const text = faker.random.words(3);
+        const user1 = await createNewUserAccount();
+        const user2 = await createNewUserAccount();
+        const user1Headers = { Authorization: `Bearer ${user1.jwt}` };
+        const user2Headers = { Authorization: `Bearer ${user2.jwt}` };
+
+        await req.post("/tweets", { text }, { headers: user1Headers });
+        await req.post("/tweets", { text }, { headers: user2Headers });
+
+        const res = await req.get("/tweets", {
+          headers: { Authorization: `Bearer ${user1.jwt}` },
+        });
+
+        expect(res.status).toBe(200);
+        expect(res.data.length).toBeGreaterThanOrEqual(2);
+      });
+
+      it("retuns only tweets of the given user when username is specified in the query", async () => {
+        const text = faker.random.words(3);
+        const user1 = await createNewUserAccount();
+        const user2 = await createNewUserAccount();
+        const user1Headers = { Authorization: `Bearer ${user1.jwt}` };
+        const user2Headers = { Authorization: `Bearer ${user2.jwt}` };
+
+        await req.post("/tweets", { text }, { headers: user1Headers });
+        await req.post("/tweets", { text }, { headers: user2Headers });
+
+        const res = await req.get("/tweets", {
+          headers: { Authorization: `Bearer ${user1.jwt}` },
+          params: { username: user1.username },
+        });
+
+        expect(res.status).toBe(200);
+        expect(res.data.length).toEqual(1);
+        expect(res.data[0].username).toMatch(user1.username);
+      });
+    });
     describe("GET /tweets/:id", () => {});
     describe("POST /tweets", () => {
       it("returns 201 and the created tweet when a tweet text is 3 characters or more", async () => {
