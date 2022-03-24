@@ -183,7 +183,34 @@ describe("Auth APIs", () => {
         expect(res.data[0].username).toMatch(user1.username);
       });
     });
-    describe("GET /tweets/:id", () => {});
+    describe("GET /tweets/:id", () => {
+      it("returns 404 when tweet id does not exist", async () => {
+        const fakerUser = await createNewUserAccount();
+
+        const res = await req.get("/tweet/GhostId", {
+          headers: { Authorization: `Bearer ${fakerUser.jwt}` },
+        });
+
+        expect(res.status).toBe(404);
+      });
+
+      it("return 200 and the tweet when tweet id exist", async () => {
+        const fakerUser = await createNewUserAccount();
+        const text = faker.random.words(3);
+        const createdTweet = await req.post(
+          "/tweets",
+          { text },
+          { headers: { Authorization: `Bearer ${fakerUser.jwt}` } }
+        );
+
+        const res = await req.get(`/tweets/${createdTweet.data.id}`, {
+          headers: { Authorization: `Bearer ${fakerUser.jwt}` },
+        });
+
+        expect(res.status).toBe(200);
+        expect(res.data.text).toMatch(text);
+      });
+    });
     describe("POST /tweets", () => {
       it("returns 201 and the created tweet when a tweet text is 3 characters or more", async () => {
         const text = faker.random.words(3);
