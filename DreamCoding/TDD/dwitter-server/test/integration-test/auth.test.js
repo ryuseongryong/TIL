@@ -246,7 +246,40 @@ describe("Auth APIs", () => {
         );
       });
     });
-    describe("PUT /tweets/:id", () => {});
+    describe("PUT /tweets/:id", () => {
+      it("returns 404 when tweet id does not exist", async () => {
+        const text = faker.random.words(3);
+        const fakerUser = await createNewUserAccount();
+
+        const res = await req.put(
+          "/tweets/GhostId",
+          { text },
+          { headers: { Authorization: `Bearer ${fakerUser.jwt}` } }
+        );
+
+        expect(res.status).toBe(404);
+        expect(res.data.message).toMatch("Tweet not found: GhostId");
+      });
+      it("returns 200 and updated tweet when tweet id exists and the tweet belongs to tweet id", async () => {
+        const text = faker.random.words(3);
+        const updatedText = faker.random.words(3);
+        const fakerUser = await createNewUserAccount();
+
+        const createdTweet = await req.post(
+          "/tweets",
+          { text },
+          { headers: { Authorization: `Bearer ${fakerUser.jwt}` } }
+        );
+        const res = await req.put(
+          `/tweets/${createdTweet.data.id}`,
+          { text: updatedText },
+          { headers: { Authorization: `Bearer ${fakerUser.jwt}` } }
+        );
+
+        expect(res.status).toBe(200);
+        expect(res.data.text).toMatch(updatedText);
+      });
+    });
     describe("DELETE /tweets/:id", () => {});
   });
 });
