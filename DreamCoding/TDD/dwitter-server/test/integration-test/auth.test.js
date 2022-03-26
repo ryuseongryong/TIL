@@ -300,7 +300,66 @@ describe("Auth APIs", () => {
         expect(res.status).toBe(403);
       });
     });
-    describe("DELETE /tweets/:id", () => {});
+    describe("DELETE /tweets/:id", () => {
+      it("returns 404 when tweet id does not exist", async () => {
+        const fakerUser = await createNewUserAccount();
+
+        const res = await req.delete("/tweets/GhostId", {
+          headers: { Authorization: `Bearer ${fakerUser.jwt}` },
+        });
+
+        expect(res.status).toBe(404);
+        expect(res.data.message).toMatch("Tweet not found: GhostId");
+      });
+      it("returns 403 and the tweet should still be there when tweet id exists but the tweet does not belong to user", async () => {
+        const text = faker.random.words(3);
+        const tweetAuthor = await createNewUserAccount();
+        const anotherUser = await createNewUserAccount();
+
+        const createdTweet = await req.post(
+          "/tweets",
+          { text },
+          { headers: { Authorization: `Bearer ${tweetAuthor.jwt}` } }
+        );
+
+        const deleteResult = await req.delete(
+          `/tweets/${createdTweet.data.id}`,
+          { headers: { Authorization: `Bearer ${anotherUser.jwt}` } }
+        );
+
+        const checkTweetResult = await req.get(
+          `/tweets/${createdTweet.data.id}`,
+          { headers: { Authorization: `Bearer ${anotherUser.jwt}` } }
+        );
+        expect(deleteResult.status).toBe(403);
+        expect(checkTweetResult.status).toBe(200);
+        expect(checkTweetResult.data).toMatchObject({ text });
+      });
+
+      it("returns 204 and the tweet should be deleted when tweet id exists and the tweet belong to user", async () => {
+        const text = faker.random.words(3);
+        const tweetAuthor = await createNewUserAccount();
+
+        const createdTweet = await req.post(
+          "/tweets",
+          { text },
+          { headers: { Authorization: `Bearer ${tweetAuthor.jwt}` } }
+        );
+
+        const deleteResult = await req.delete(
+          `/tweets/${createdTweet.data.id}`,
+          { headers: { Authorization: `Bearer ${tweetAuthor.jwt}` } }
+        );
+
+        const checkTweetResult = await req.get(
+          `/tweets/${createdTweet.data.id}`,
+          { headers: { Authorization: `Bearer ${tweetAuthor.jwt}` } }
+        );
+
+        expect(deleteResult.status).toBe(204);
+        expect(checkTweetResult.status).toBe(404);
+      });
+    });
   });
 });
 
