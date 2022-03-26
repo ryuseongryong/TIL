@@ -279,6 +279,26 @@ describe("Auth APIs", () => {
         expect(res.status).toBe(200);
         expect(res.data.text).toMatch(updatedText);
       });
+      it("returns 403 when tweet id exists but the tweet does not belong to the user", async () => {
+        const text = faker.random.words(3);
+        const updatedText = faker.random.words(3);
+        const tweetAuthor = await createNewUserAccount();
+        const anotherUser = await createNewUserAccount();
+
+        const createdTweet = await req.post(
+          "/tweets",
+          { text },
+          { headers: { Authorization: `Bearer ${tweetAuthor.jwt}` } }
+        );
+
+        const res = await req.put(
+          `/tweets/${createdTweet.data.id}`,
+          { text: updatedText },
+          { headers: { Authorization: `Bearer ${anotherUser.jwt}` } }
+        );
+
+        expect(res.status).toBe(403);
+      });
     });
     describe("DELETE /tweets/:id", () => {});
   });
