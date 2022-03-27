@@ -43,9 +43,9 @@ export async function startServer(port) {
 
   await sequelize.sync();
 
-  console.log("Server is started....");
   const server = app.listen(port);
   initSocket(server);
+  console.log(`Server is started.... port: ${server.address().port}`);
   return server;
 }
 export async function stopServer(server) {
