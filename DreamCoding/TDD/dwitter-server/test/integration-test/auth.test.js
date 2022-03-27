@@ -2,6 +2,7 @@ import axios from "axios";
 import faker from "@faker-js/faker";
 import { startServer, stopServer } from "../../app.js";
 import { sequelize } from "../../db/database";
+import { createNewUserAccount, makeValidUserDetails } from "./auth_utils.js";
 // 테스트 전 서 시작 및 데이터베이스 초기화 설정
 // 테스트 후  데이터베이스 초기화 하기
 
@@ -10,7 +11,7 @@ describe("Auth APIs", () => {
   beforeAll(async () => {
     server = await startServer();
     req = axios.create({
-      baseURL: "http://localhost:8080/",
+      baseURL: `http://localhost:${server.address().port}`,
       validateStatus: null,
     });
   });
@@ -84,7 +85,7 @@ describe("Auth APIs", () => {
 
   describe("POST to /auth/login", () => {
     it("returns 200 and authorization token when user credentials are valid", async () => {
-      const fakerUser = await createNewUserAccount();
+      const fakerUser = await createNewUserAccount(req);
 
       const res = await req.post("/auth/login", {
         username: fakerUser.username,
@@ -95,7 +96,7 @@ describe("Auth APIs", () => {
       expect(res.data.token.length).toBeGreaterThan(0);
     });
     it("returns 401 when password is incorrect", async () => {
-      const fakerUser = await createNewUserAccount();
+      const fakerUser = await createNewUserAccount(req);
 
       const res = await req.post("/auth/login", {
         username: fakerUser.username,
@@ -106,7 +107,7 @@ describe("Auth APIs", () => {
       expect(res.data).toMatchObject({ message: "Invalid user or password" });
     });
     it("returns 401 when username is not found", async () => {
-      const fakerUser = await createNewUserAccount();
+      const fakerUser = await createNewUserAccount(req);
 
       const res = await req.post("/auth/login", {
         username: faker.internet.userName(),
@@ -120,7 +121,7 @@ describe("Auth APIs", () => {
 
   describe("GET to /auth/me", () => {
     it("returns user details when valid token is present in Authorization header", async () => {
-      const fakerUser = await createNewUserAccount();
+      const fakerUser = await createNewUserAccount(req);
 
       const res = await req.get("/auth/me", {
         headers: { Authorization: `Bearer ${fakerUser.jwt}` },
@@ -134,21 +135,12 @@ describe("Auth APIs", () => {
     });
   });
 
-  async function createNewUserAccount() {
-    const userDetails = makeValidUserDetails();
-    const prepareUserRes = await req.post("/auth/signup", userDetails);
-    return {
-      ...userDetails,
-      jwt: prepareUserRes.data.token,
-    };
-  }
-
   describe("Tweets APIs", () => {
     describe("GET /tweets", () => {
       it("returns all tweets when username is not specified in the query", async () => {
         const text = faker.random.words(3);
-        const user1 = await createNewUserAccount();
-        const user2 = await createNewUserAccount();
+        const user1 = await createNewUserAccount(req);
+        const user2 = await createNewUserAccount(req);
         const user1Headers = { Authorization: `Bearer ${user1.jwt}` };
         const user2Headers = { Authorization: `Bearer ${user2.jwt}` };
 
@@ -165,8 +157,8 @@ describe("Auth APIs", () => {
 
       it("retuns only tweets of the given user when username is specified in the query", async () => {
         const text = faker.random.words(3);
-        const user1 = await createNewUserAccount();
-        const user2 = await createNewUserAccount();
+        const user1 = await createNewUserAccount(req);
+        const user2 = await createNewUserAccount(req);
         const user1Headers = { Authorization: `Bearer ${user1.jwt}` };
         const user2Headers = { Authorization: `Bearer ${user2.jwt}` };
 
@@ -185,7 +177,7 @@ describe("Auth APIs", () => {
     });
     describe("GET /tweets/:id", () => {
       it("returns 404 when tweet id does not exist", async () => {
-        const fakerUser = await createNewUserAccount();
+        const fakerUser = await createNewUserAccount(req);
 
         const res = await req.get("/tweet/GhostId", {
           headers: { Authorization: `Bearer ${fakerUser.jwt}` },
@@ -195,7 +187,7 @@ describe("Auth APIs", () => {
       });
 
       it("return 200 and the tweet when tweet id exist", async () => {
-        const fakerUser = await createNewUserAccount();
+        const fakerUser = await createNewUserAccount(req);
         const text = faker.random.words(3);
         const createdTweet = await req.post(
           "/tweets",
@@ -214,7 +206,7 @@ describe("Auth APIs", () => {
     describe("POST /tweets", () => {
       it("returns 201 and the created tweet when a tweet text is 3 characters or more", async () => {
         const text = faker.random.words(3);
-        const fakerUser = await createNewUserAccount();
+        const fakerUser = await createNewUserAccount(req);
 
         const res = await req.post(
           "/tweets",
@@ -232,7 +224,7 @@ describe("Auth APIs", () => {
 
       it("returns 400 when a tweet text is less than 3 characters", async () => {
         const text = faker.random.alpha({ count: 2 });
-        const fakerUser = await createNewUserAccount();
+        const fakerUser = await createNewUserAccount(req);
 
         const res = await req.post(
           "/tweets",
@@ -249,7 +241,7 @@ describe("Auth APIs", () => {
     describe("PUT /tweets/:id", () => {
       it("returns 404 when tweet id does not exist", async () => {
         const text = faker.random.words(3);
-        const fakerUser = await createNewUserAccount();
+        const fakerUser = await createNewUserAccount(req);
 
         const res = await req.put(
           "/tweets/GhostId",
@@ -263,7 +255,7 @@ describe("Auth APIs", () => {
       it("returns 200 and updated tweet when tweet id exists and the tweet belongs to tweet id", async () => {
         const text = faker.random.words(3);
         const updatedText = faker.random.words(3);
-        const fakerUser = await createNewUserAccount();
+        const fakerUser = await createNewUserAccount(req);
 
         const createdTweet = await req.post(
           "/tweets",
@@ -282,8 +274,8 @@ describe("Auth APIs", () => {
       it("returns 403 when tweet id exists but the tweet does not belong to the user", async () => {
         const text = faker.random.words(3);
         const updatedText = faker.random.words(3);
-        const tweetAuthor = await createNewUserAccount();
-        const anotherUser = await createNewUserAccount();
+        const tweetAuthor = await createNewUserAccount(req);
+        const anotherUser = await createNewUserAccount(req);
 
         const createdTweet = await req.post(
           "/tweets",
@@ -302,7 +294,7 @@ describe("Auth APIs", () => {
     });
     describe("DELETE /tweets/:id", () => {
       it("returns 404 when tweet id does not exist", async () => {
-        const fakerUser = await createNewUserAccount();
+        const fakerUser = await createNewUserAccount(req);
 
         const res = await req.delete("/tweets/GhostId", {
           headers: { Authorization: `Bearer ${fakerUser.jwt}` },
@@ -313,8 +305,8 @@ describe("Auth APIs", () => {
       });
       it("returns 403 and the tweet should still be there when tweet id exists but the tweet does not belong to user", async () => {
         const text = faker.random.words(3);
-        const tweetAuthor = await createNewUserAccount();
-        const anotherUser = await createNewUserAccount();
+        const tweetAuthor = await createNewUserAccount(req);
+        const anotherUser = await createNewUserAccount(req);
 
         const createdTweet = await req.post(
           "/tweets",
@@ -338,7 +330,7 @@ describe("Auth APIs", () => {
 
       it("returns 204 and the tweet should be deleted when tweet id exists and the tweet belong to user", async () => {
         const text = faker.random.words(3);
-        const tweetAuthor = await createNewUserAccount();
+        const tweetAuthor = await createNewUserAccount(req);
 
         const createdTweet = await req.post(
           "/tweets",
@@ -362,15 +354,3 @@ describe("Auth APIs", () => {
     });
   });
 });
-
-function makeValidUserDetails() {
-  const fakerUser = faker.helpers.userCard();
-  const { name, username, email } = fakerUser;
-  const user = {
-    name,
-    username,
-    email,
-    password: faker.internet.password(10, true),
-  };
-  return user;
-}
