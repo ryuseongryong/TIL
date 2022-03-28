@@ -33,6 +33,7 @@
     "axios": "^0.26.1",
     "jest": "^27.5.1",
     "node-mocks-http": "^1.11.0",
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.7",
+    "socket.io-client": "^4.4.1"
   }
 }
