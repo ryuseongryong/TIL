@@ -24,6 +24,7 @@ export default {
     "**/*.js",
     "!**/node_modules/**",
     "!**/coverage/lcov-report/**",
+    "!**/integration-test/**",
   ],
 
   // The directory where Jest should output its coverage files
