@@ -20,3 +20,5 @@ Python_Angela_Docs/
 
 **/__pycache__/
 **/.idea/
+
+Pipfile*
