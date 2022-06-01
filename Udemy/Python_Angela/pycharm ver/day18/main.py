@@ -1,5 +1,6 @@
 from turtle import Turtle, Screen
-import heroes
+import random
+# import heroes
 
 timmy_the_turtle = Turtle()
 # timmy_the_turtle.shape("turtle")
@@ -14,8 +15,28 @@ timmy_the_turtle = Turtle()
 #         timmy_the_turtle.penup()
 #         timmy_the_turtle.forward(10)
 
-# screen = Screen()
-# screen.exitonclick()
+# print(heroes.gen())
+
+t = Turtle()
+t.left(180)
+
+colors = ["CornflowerBlue", "DarkOrchid", "IndianRed", "DeepSkyBlue", "LightSeaGreen", "wheat", "SlateGray", "SeaGreen"]
+
+def draw_shape(sides):
+    angle = 360 / sides
+    for _ in range(sides):
+        t.forward(100)
+        t.right(angle)
+
+for shape in range(3, 11):
+    t.color(random.choice(colors))
+    draw_shape(shape)
 
 
-print(heroes.gen())
+
+
+
+
+
+screen = Screen()
+screen.exitonclick()
