@@ -1,5 +1,6 @@
 from turtle import Turtle, Screen
 import random
+import turtle
 # import heroes
 
 timmy_the_turtle = Turtle()
@@ -18,8 +19,8 @@ timmy_the_turtle = Turtle()
 # print(heroes.gen())
 
 t = Turtle()
-# t.colormode(255)
-t.fillcolor(255)
+turtle.colormode(255)
+# t.fillcolor(255)
 # t.left(180)
 
 def random_color():
