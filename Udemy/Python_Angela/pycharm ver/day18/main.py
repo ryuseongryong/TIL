@@ -18,7 +18,17 @@ timmy_the_turtle = Turtle()
 # print(heroes.gen())
 
 t = Turtle()
+# t.colormode(255)
+t.fillcolor(255)
 # t.left(180)
+
+def random_color():
+        r = random.randint(0, 255)
+        g = random.randint(0, 255)
+        b = random.randint(0, 255)
+        random_color = (r, g, b)
+        return random_color
+
 
 colors = ["CornflowerBlue", "DarkOrchid", "IndianRed", "DeepSkyBlue", "LightSeaGreen", "wheat", "SlateGray", "SeaGreen"]
 directions = [0, 90, 180, 270]
@@ -36,7 +46,8 @@ t.speed("fast")
 #     draw_shape(shape)
 
 for _ in range(100):
-    t.color(random.choice(colors))
+    # t.color(random.choice(colors))
+    t.color(random_color())
     t.forward(30)
     t.setheading(random.choice(directions))
 
