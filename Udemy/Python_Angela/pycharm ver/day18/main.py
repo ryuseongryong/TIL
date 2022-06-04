@@ -27,14 +27,14 @@ def random_color():
         r = random.randint(0, 255)
         g = random.randint(0, 255)
         b = random.randint(0, 255)
-        random_color = (r, g, b)
-        return random_color
+        color = (r, g, b)
+        return color
 
 
-colors = ["CornflowerBlue", "DarkOrchid", "IndianRed", "DeepSkyBlue", "LightSeaGreen", "wheat", "SlateGray", "SeaGreen"]
-directions = [0, 90, 180, 270]
-t.pensize(10)
-t.speed("fast")
+# colors = ["CornflowerBlue", "DarkOrchid", "IndianRed", "DeepSkyBlue", "LightSeaGreen", "wheat", "SlateGray", "SeaGreen"]
+# directions = [0, 90, 180, 270]
+# t.pensize(10)
+t.speed("fastest")
 
 # def draw_shape(sides):
 #     angle = 360 / sides
@@ -46,11 +46,16 @@ t.speed("fast")
 #     t.color(random.choice(colors))
 #     draw_shape(shape)
 
-for _ in range(100):
-    # t.color(random.choice(colors))
+# for _ in range(100):
+#     # t.color(random.choice(colors))
+#     t.color(random_color())
+#     t.forward(30)
+#     t.setheading(random.choice(directions))
+for _ in range(359):
+    cur_heading = t.heading()
+    t.setheading(cur_heading + 1)
     t.color(random_color())
-    t.forward(30)
-    t.setheading(random.choice(directions))
+    t.circle(100)
 
 
 
