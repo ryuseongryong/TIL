@@ -51,11 +51,20 @@ t.speed("fastest")
 #     t.color(random_color())
 #     t.forward(30)
 #     t.setheading(random.choice(directions))
-for _ in range(359):
-    cur_heading = t.heading()
-    t.setheading(cur_heading + 1)
-    t.color(random_color())
-    t.circle(100)
+# for _ in range(359):
+#     cur_heading = t.heading()
+#     t.setheading(cur_heading + 1)
+#     t.color(random_color())
+#     t.circle(100)
+
+def draw_spirograph(size_of_gap):
+    for _ in range(int(360 / size_of_gap)):
+        t.color(random_color())
+        t.circle(100)
+        t.setheading(t.heading() + size_of_gap)
+
+draw_spirograph(5)
+
 
 
 
