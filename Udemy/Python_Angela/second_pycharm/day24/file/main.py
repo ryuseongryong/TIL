@@ -1,6 +1,19 @@
 from importlib.resources import contents
 
 
-file = open("file.txt")
-contents = file.read()
-print(contents)
+import os
+
+# a = os.listdir("./Udemy/Python_Angela/second_pycharm/day24/file")
+# b = os.getcwd()
+c = os.chdir("./Udemy/Python_Angela/second_pycharm/day24/file")
+
+# with open("file.txt") as file:
+#     contents = file.read()
+#     print(contents)
+
+
+with open("new_file.txt", "w") as file:
+    contents = file.write("New text in new file.")
+
+# with open("file.txt", "a") as file:
+#     contents = file.write("\nNew text again.")
