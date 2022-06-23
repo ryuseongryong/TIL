@@ -9,7 +9,7 @@
 import os
 
 os.chdir(
-    "./Udemy/Python_Angela/second_pycharm/day24/mail_merge/Mail Merge Project Start/"
+    "./Udemy/Python_Angela/second_local/day24/mail_merge/Mail Merge Project Start/"
 )
 
 PLACEHOLDER = "[name]"

@@ -3,9 +3,9 @@ from importlib.resources import contents
 
 import os
 
-# a = os.listdir("./Udemy/Python_Angela/second_pycharm/day24/file")
+# a = os.listdir("./Udemy/Python_Angela/second_local/day24/file")
 # b = os.getcwd()
-c = os.chdir("./Udemy/Python_Angela/second_pycharm/day24/file")
+c = os.chdir("./Udemy/Python_Angela/second_local/day24/file")
 
 # with open("file.txt") as file:
 #     contents = file.read()

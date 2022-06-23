@@ -1,7 +1,7 @@
 from turtle import Turtle
 import os
 
-os.chdir("./Udemy/Python_Angela/second_pycharm/day24")
+os.chdir("./Udemy/Python_Angela/second_local/day24")
 
 ALIGNMENT = "center"
 FONT = ("Courier", 24, "normal")
