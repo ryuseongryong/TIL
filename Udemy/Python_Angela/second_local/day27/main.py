@@ -25,7 +25,7 @@
 #     print(a, b, c)
 
 
-# Unlimited Arguments
+# Unlimited positional Arguments
 def add(*args):
     # type of args = tuple
     print(args)
@@ -38,3 +38,17 @@ def add(*args):
 
 
 print(add(1, 2, 3))
+
+
+def calculate(n, **kwargs):
+    # type of kwargs = dict
+    print(kwargs)
+    # for key, val in kwargs.items():
+    #     print(key)
+    #     print(val)
+    n += kwargs["add"]
+    n *= kwargs["multiply"]
+    print(n)
+
+
+calculate(2, add=3, multiply=5)
