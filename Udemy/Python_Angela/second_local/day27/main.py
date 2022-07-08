@@ -1,20 +1,28 @@
-import tkinter
+from tkinter import *
 
-window = tkinter.Tk()
+window = Tk()
 window.title("My First GUI Program")
 window.minsize(width=500, height=300)
 
 # Label
 
-my_label = tkinter.Label(text="I Am a Label", font=("Arial", 24, "italic"))
+my_label = Label(text="I Am a Label", font=("Arial", 24, "italic"))
 # my_label.pack(side="left")
-my_label.pack(expand=True)
+# my_label.pack(expand=True)
+my_label.pack()
+
+my_label["text"] = "New Text"
+my_label.config(text="New Text")
 
 
-import turtle
+def button_clicked():
+    print("clicked")
+    my_label.config(text="button clicked")
 
-t = turtle.Turtle()
-t.write("hello")
+
+button = Button(text="Click Me", command=button_clicked)
+button.pack()
+
 
 window.mainloop()
 # https://docs.python.org/3/library/tkinter.html
