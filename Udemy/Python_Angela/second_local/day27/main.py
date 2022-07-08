@@ -23,6 +23,10 @@ def button_clicked():
 button = Button(text="Click Me", command=button_clicked)
 button.pack()
 
+# Entry
+input = Entry(width=10)
+input.pack()
+
 
 window.mainloop()
 # https://docs.python.org/3/library/tkinter.html
