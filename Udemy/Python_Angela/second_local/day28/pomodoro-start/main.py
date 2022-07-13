@@ -1,7 +1,8 @@
 from tkinter import *
-import os
 
-os.chdir("./Udemy/Python_Angela/second_local/day28/pomodoro-start/")
+# import os
+
+# os.chdir("./Udemy/Python_Angela/second_local/day28/pomodoro-start/")
 # print(os.getcwd())
 
 # ---------------------------- CONSTANTS ------------------------------- #
@@ -25,9 +26,12 @@ LONG_BREAK_MIN = 20
 
 window = Tk()
 window.title("Pomodoro")
-canvas = Canvas(width=413, height=531)
-bg_img = PhotoImage(file="toamto.png")
+window.config(padx=20, pady=10, bg=YELLOW)
+
+canvas = Canvas(width=413, height=531, bg=YELLOW, highlightthickness=0)
+bg_img = PhotoImage(file="image.png")
 canvas.create_image(206, 265, image=bg_img)
+canvas.create_text(206, 385, text="00:00", fill="black", font=(FONT_NAME, 35, "bold"))
 canvas.pack()
 
 window.mainloop()
