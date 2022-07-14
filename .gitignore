@@ -22,3 +22,5 @@ Python_Angela_Docs/
 **/.idea/
 
 Pipfile*
+*.jpeg
+*.png
