@@ -1,7 +1,7 @@
-from email import message
 from tkinter import *
 from tkinter import messagebox
 from random import choice, randint, shuffle
+import pyperclip
 import os
 
 os.chdir("./Udemy/Python_Angela/second_local/day29/password-manager-start")
@@ -73,6 +73,7 @@ def generate_password():
 
     password = "".join(password_list)
     password_entry.insert(0, password)
+    pyperclip.copy(password)
 
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
