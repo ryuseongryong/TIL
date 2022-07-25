@@ -34,11 +34,23 @@ os.chdir("./Udemy/Python_Angela/second_local/day30")
 #     file.close()
 #     print("File was closed")
 
-height = float(input("Height: "))
-weight = int(input("Weight: "))
+# height = float(input("Height: "))
+# weight = int(input("Weight: "))
 
-if height > 3:
-    raise ValueError("Human Height should not be over 3 meters")
+# if height > 3:
+#     raise ValueError("Human Height should not be over 3 meters")
 
-bmi = weight / height**2
-print(bmi)
+# bmi = weight / height**2
+# print(bmi)
+
+# IndexError Handling
+fruits = ["Apple", "Pear", "Orange"]
+
+
+def make_pie(index):
+    try:
+        fruit = fruits[index]
+    except IndexError:
+        print("Fruit pie")
+    else:
+        print(fruit + " pie")
