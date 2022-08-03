@@ -1,23 +1,24 @@
-# import smtplib
-
-# my_email = "ryuseongryong@gmail.com"
-# password = ""
-
-# with smtplib.SMTP("smtp.gmail.com") as connection:
-#     connection.starttls()
-#     connection.login(user=my_email, password=password)
-#     connection.sendmail(
-#         from_addr=my_email,
-#         to_addrs=my_email,
-#         msg="Subject:Hello\n\nThis is the body of my email.",
-#     )
+from calendar import weekday
+import smtplib
 import datetime as dt
+import random
+import os
+
+os.chdir("./Udemy/Python_Angela/second_local/day32/Birthday Wisher (day 32) start")
+
+MY_EMAIL = "ryuseongryong@gmail.com"
+MY_PASSWORD = ""
+
 
 now = dt.datetime.now()
-year = now.year
-month = now.month
-day_of_week = now.weekday()
-print(now, year, month, day_of_week)
+weekday = now.weekday()
+if weekday == 2:
+    with open("quotes.txt") as quote_file:
+        all_quotes = quote_file.readlines()
+        quote = random.choice(all_quotes)
 
-date_of_birth = dt.date(year=1993, month=9, day=25)
-print(date_of_birth)
+    print(quote)
+    with smtplib.SMTP("smtp.gmail.com") as connection:
+        connection.starttls()
+        connection.login(MY_EMAIL, MY_PASSWORD)
+        connection.sendmail(from_addr=MY_EMAIL, to_addrs=MY_EMAIL, msg=f"Subject:Daily")
