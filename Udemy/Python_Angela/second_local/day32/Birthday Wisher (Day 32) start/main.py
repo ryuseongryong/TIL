@@ -7,7 +7,7 @@ import os
 os.chdir("./Udemy/Python_Angela/second_local/day32/Birthday Wisher (day 32) start")
 
 MY_EMAIL = "ryuseongryong@gmail.com"
-MY_PASSWORD = "ilgihurhqdwgoafr"
+MY_PASSWORD = ""
 
 
 now = dt.datetime.now()

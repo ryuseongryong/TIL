@@ -1,6 +1,10 @@
-import os, datetime, pandas, random
+import os, datetime, pandas, random, smtplib
 
 os.chdir("./Udemy/Python_Angela/second_local/day32/birthday-wisher-extrahard-start")
+
+
+
+
 now = datetime.datetime.now()
 today = (now.month, now.day)
 
@@ -13,10 +17,13 @@ birthdays_dict = {
 }
 
 if today in birthdays_dict:
+    birthday_person = birthdays_dict[today]
     file_path = f"letter_templates/letter_{random.randint(1, 3)}.txt"
     with open(file_path) as letter_file:
         contents = letter_file.read()
-        contents.replace("[NAME]", birthdays_dict[today])
+        contents.replace("[NAME]", birthday_person["name"])
+
+    with smtplib.SMTP()
 
 
 ##################### Extra Hard Starting Project ######################
