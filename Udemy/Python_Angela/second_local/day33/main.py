@@ -6,7 +6,7 @@ import datetime
 
 
 MY_EMAIL = "ryuseongryong@gmail.com"
-MY_PASSWORD = "otwwdwbscmnztjbg"
+MY_PASSWORD = ""
 MY_LAT = 37.450027
 MY_LONG = 126.906663
 
