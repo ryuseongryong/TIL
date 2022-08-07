@@ -3,7 +3,7 @@ import os, datetime, pandas, random, smtplib
 os.chdir("./Udemy/Python_Angela/second_local/day32/birthday-wisher-extrahard-start")
 
 MY_EMAIL = "ryuseongryong@gmail.com"
-MY_PASSWORD = "ubhxnclgbvivzuyt"
+MY_PASSWORD = ""
 
 
 now = datetime.datetime.now()
