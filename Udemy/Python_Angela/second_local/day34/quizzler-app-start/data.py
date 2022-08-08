@@ -5,7 +5,7 @@ params = {"amount": 10, "type": "boolean"}
 res = requests.get("https://opentdb.com/api.php", params=params)
 res.raise_for_status()
 data = res.json()
-print(data["result"])
+question_data = data["results"]
 
 # question_data = [
 #     {
