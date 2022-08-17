@@ -7,6 +7,7 @@ os.chdir("./Udemy/Python_Angela/second_local/day35")
 load_dotenv()
 
 OWN_Endpoint = "https://api.openweathermap.org/data/2.5/onecall"
+print(os.environ.get("API_KEY"))
 API_KEY = os.getenv("API_KEY")
 LAT = os.getenv("LATITUDE")
 LONG = os.getenv("LONGITUDE")
