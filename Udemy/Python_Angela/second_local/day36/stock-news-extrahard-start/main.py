@@ -30,6 +30,16 @@ day_before_yesterday_data = data_list[1]
 day_before_yesterday_data_closing_price = day_before_yesterday_data["4. close"]
 print(day_before_yesterday_data_closing_price)
 
+diff_price = abs(
+    float(yesterday_closing_price) - float(day_before_yesterday_data_closing_price)
+)
+diff_pct = (diff_price / float(yesterday_closing_price)) * 100
+print(diff_price)
+print(diff_pct)
+
+if diff_pct > 5:
+    print("Get News")
+
 ## STEP 2: Use https://newsapi.org
 # Instead of printing ("Get News"), actually get the first 3 news pieces for the COMPANY_NAME.
 
