@@ -12,6 +12,7 @@ STOCK_ENDPOINT = "https://www.alphavantage.co/query"
 NEWS_ENDPOINT = "https://newsapi.org/v2/everything"
 
 STOCK_API_KEY = os.getenv("STOCK_API_KEY")
+NEWS_API_KEY = os.getenv("NEWS_API_KEY")
 
 stock_params = {
     "function": "TIME_SERIES_DAILY",
@@ -19,8 +20,8 @@ stock_params = {
     "apikey": STOCK_API_KEY,
 }
 
-res = requests.get(STOCK_ENDPOINT, params=stock_params)
-data = res.json()["Time Series (Daily)"]
+stock_res = requests.get(STOCK_ENDPOINT, params=stock_params)
+data = stock_res.json()["Time Series (Daily)"]
 data_list = [val for (key, val) in data.items()]
 yesterday_data = data_list[0]
 yesterday_closing_price = yesterday_data["4. close"]
@@ -37,8 +38,17 @@ diff_pct = (diff_price / float(yesterday_closing_price)) * 100
 print(diff_price)
 print(diff_pct)
 
-if diff_pct > 5:
-    print("Get News")
+if diff_pct > 2:
+    news_params = {
+        "apiKey": NEWS_API_KEY,
+        "qInTitle": COMPANY_NAME,
+    }
+
+    news_res = requests.get(NEWS_ENDPOINT, params=news_params)
+    articles = news_res.json()["articles"]
+
+    three_articles = articles[:3]
+    print(three_articles)
 
 ## STEP 2: Use https://newsapi.org
 # Instead of printing ("Get News"), actually get the first 3 news pieces for the COMPANY_NAME.
