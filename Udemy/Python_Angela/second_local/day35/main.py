@@ -13,7 +13,8 @@ LAT = os.getenv("LATITUDE")
 LONG = os.getenv("LONGITUDE")
 account_sid = os.environ["TWILIO_ACCOUNT_SID"]
 auth_token = os.environ["TWILIO_AUTH_TOKEN"]
-
+FROM_PHONE = os.getenv("FROM_PHONE")
+TO_PHONE = os.getenv("TO_PHONE")
 
 weather_params = {
     "lat": LAT,
@@ -40,8 +41,8 @@ if will_rain:
 
     message = client.messages.create(
         body="Bring an Umbrella!!☔︎",
-        from_="+12484793832",
-        to="+821076480065",
+        from_=FROM_PHONE,
+        to=TO_PHONE,
     )
 
     print(message.sid, message.status)
