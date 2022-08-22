@@ -1,5 +1,6 @@
 import requests, os
 from dotenv import load_dotenv
+from twilio.rest import Client
 
 os.chdir("./Udemy/Python_Angela/second_local/day36")
 load_dotenv()
@@ -13,6 +14,8 @@ NEWS_ENDPOINT = "https://newsapi.org/v2/everything"
 
 STOCK_API_KEY = os.getenv("STOCK_API_KEY")
 NEWS_API_KEY = os.getenv("NEWS_API_KEY")
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 
 stock_params = {
     "function": "TIME_SERIES_DAILY",
@@ -50,8 +53,16 @@ if diff_pct > 2:
     three_articles = articles[:3]
     print(three_articles)
 
-## STEP 2: Use https://newsapi.org
-# Instead of printing ("Get News"), actually get the first 3 news pieces for the COMPANY_NAME.
+    formatted_articles = [
+        f"Headline: {article['title']}. \nBrief: {article['description']}"
+        for article in three_articles
+    ]
+    client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+    for article in formatted_articles:
+        message = client.messages.create(
+            body=article,
+            from="",
+        )
 
 ## STEP 3: Use https://www.twilio.com
 # Send a seperate message with the percentage change and each article's title and description to your phone number.
