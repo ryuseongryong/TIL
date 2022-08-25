@@ -7,7 +7,7 @@ load_dotenv()
 TOKEN = os.getenv("TOKEN")
 USERNAME = os.getenv("USERNAME")
 
-pixela_endpoint = "https://pixe.la/v1/users/"
+pixela_endpoint = "https://pixe.la/v1/users"
 
 user_params = {
     "token": TOKEN,
@@ -32,4 +32,4 @@ graph_config = {
 headers = {"X-USER-TOKEN": TOKEN}
 
 res = requests.post(url=graph_endpoint, json=graph_config, headers=headers)
-print(res)
+print(res.text)
