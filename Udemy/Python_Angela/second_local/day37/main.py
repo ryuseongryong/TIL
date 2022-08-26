@@ -6,6 +6,7 @@ os.chdir("./Udemy/Python_Angela/second_local/day37")
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
 USERNAME = os.getenv("USERNAME")
+GRAPH_ID = "graph1"
 
 pixela_endpoint = "https://pixe.la/v1/users"
 
@@ -23,7 +24,7 @@ user_params = {
 graph_endpoint = f"{pixela_endpoint}/{USERNAME}/graphs"
 
 graph_config = {
-    "id": "graph1",
+    "id": GRAPH_ID,
     "name": "Cycling Graph",
     "unit": "Km",
     "type": "float",
@@ -31,5 +32,12 @@ graph_config = {
 }
 headers = {"X-USER-TOKEN": TOKEN}
 
-res = requests.post(url=graph_endpoint, json=graph_config, headers=headers)
+# res = requests.post(url=graph_endpoint, json=graph_config, headers=headers)
+# print(res.text)
+
+pixel_creation_endpoint = f"{pixela_endpoint}/{USERNAME}/graphs/{GRAPH_ID}"
+
+pixel_data = {"date": "20220826", "quantity": "9.74"}
+
+res = requests.post(url=pixel_creation_endpoint, json=pixel_data, headers=headers)
 print(res.text)
