@@ -43,5 +43,10 @@ print(today.strftime("%Y%m%d"))
 
 pixel_data = {"date": today.strftime("%Y%m%d"), "quantity": "18"}
 
-res = requests.post(url=pixel_creation_endpoint, json=pixel_data, headers=headers)
+# res = requests.post(url=pixel_creation_endpoint, json=pixel_data, headers=headers)
+# print(res.text)
+
+update_endpoint = f"{pixela_endpoint}/{USERNAME}/graphs/{GRAPH_ID}/{today.strftime('%Y%m%d')}"
+update_data = {"quantity": "27"}
+res = requests.put(url=update_endpoint, json=update_data, headers=headers)
 print(res.text)
