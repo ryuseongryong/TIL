@@ -1,6 +1,7 @@
 import os
 import requests
 from dotenv import load_dotenv
+from datetime import datetime
 
 os.chdir("./Udemy/Python_Angela/second_local/day37")
 load_dotenv()
@@ -37,7 +38,10 @@ headers = {"X-USER-TOKEN": TOKEN}
 
 pixel_creation_endpoint = f"{pixela_endpoint}/{USERNAME}/graphs/{GRAPH_ID}"
 
-pixel_data = {"date": "20220826", "quantity": "9.74"}
+today = datetime.now()
+print(today.strftime("%Y%m%d"))
+
+pixel_data = {"date": today.strftime("%Y%m%d"), "quantity": "18"}
 
 res = requests.post(url=pixel_creation_endpoint, json=pixel_data, headers=headers)
 print(res.text)
