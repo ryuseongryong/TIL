@@ -1,6 +1,7 @@
 import os
 import requests
 from dotenv import load_dotenv
+from datetime import datetime
 
 os.chdir("./Udemy/Python_Angela/second_local/day38")
 load_dotenv()
@@ -17,18 +18,17 @@ exercise_endpoint = "https://trackapi.nutritionix.com/v2/natural/exercise"
 
 exercise_text = input("Which exercises you did? ")
 
-headers = {
-    "x-app-id": APP_ID,
-    "x-app-key": API_KEY
-}
+headers = {"x-app-id": APP_ID, "x-app-key": API_KEY}
 
 params = {
     "query": exercise_text,
     "gender": GENDER,
     "weight_kg": WEIGHT,
     "height_cm": HEIGHT,
-    "age": AGE
+    "age": AGE,
 }
 
 res = requests.post(exercise_endpoint, json=params, headers=headers)
 print(res.json(), res)
+
+email_endpoint = "https://v2-api.sheety.co/phill/"
