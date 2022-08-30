@@ -14,6 +14,7 @@ AGE = "30"
 APP_ID = os.getenv("APP_ID")
 API_KEY = os.getenv("API_KEY")
 API_URL = os.getenv("API_URL")
+TOKEN = os.getenv("TOKEN")
 
 
 exercise_endpoint = "https://trackapi.nutritionix.com/v2/natural/exercise"
@@ -21,6 +22,9 @@ exercise_endpoint = "https://trackapi.nutritionix.com/v2/natural/exercise"
 exercise_text = input("Which exercises you did? ")
 
 headers = {"x-app-id": APP_ID, "x-app-key": API_KEY}
+bearer_header = {
+    "Authorization": TOKEN
+}
 
 params = {
     "query": exercise_text,
@@ -48,6 +52,6 @@ for exercise in data["exercises"]:
         }
     }
 
-    sheet_res = requests.post(API_URL, json=sheet_inputs)
+    sheet_res = requests.post(API_URL, json=sheet_inputs, headers=bearer_header)
 
     print(sheet_res.text)
