@@ -19,8 +19,22 @@ class DataManager:
     def get_destination_data(self):
         res = requests.get(url=SHEETY_ENDPOINT, headers=bearer_header)
         data = res.json()
-        return data
+        self.destination_data = data["prices"]
+        return self.destination_data
 
+    def update_destination_iatacode(self):
+        for city in self.destination_data:
+            new_data = {
+                "price": {
+                    "iataCode": city["iataCode"]
+                }
+            }
+            res = requests.put(
+                url=f"{SHEETY_ENDPOINT}/{city['id']}",
+                json=new_data
+            )
+            print(res.text)
+            return res.text
 
-a = DataManager().get_destination_data()
-print(a)
+print(DataManager().get_destination_data())
+DataManager().update_destination_iatacode()
