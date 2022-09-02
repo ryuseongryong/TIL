@@ -15,4 +15,4 @@ class FlightSearch:
         return code
 
 
-FlightSearch().get_destination_code()
+print(FlightSearch().get_destination_code("Paris"))
