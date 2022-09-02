@@ -1,4 +1,3 @@
-from email import header
 import requests, os
 from dotenv import load_dotenv
 
@@ -24,17 +23,11 @@ class DataManager:
 
     def update_destination_iatacode(self):
         for city in self.destination_data:
-            new_data = {
-                "price": {
-                    "iataCode": city["iataCode"]
-                }
-            }
-            res = requests.put(
-                url=f"{SHEETY_ENDPOINT}/{city['id']}",
-                json=new_data
-            )
+            new_data = {"price": {"iataCode": city["iataCode"]}}
+            res = requests.put(url=f"{SHEETY_ENDPOINT}/{city['id']}", json=new_data)
             print(res.text)
             return res.text
+
 
 print(DataManager().get_destination_data())
 DataManager().update_destination_iatacode()
