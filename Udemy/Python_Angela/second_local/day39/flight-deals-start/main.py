@@ -1,9 +1,10 @@
 from data_manager import DataManager
 
+print("start main")
 data_manager = DataManager()
 sheet_data = data_manager.get_destination_data()
 
-if sheet_data[1]["iataCode"] == "":
+if sheet_data[0]["iataCode"] == "Test":
 
     for row in sheet_data:
         from flight_search import FlightSearch
@@ -17,3 +18,4 @@ if sheet_data[1]["iataCode"] == "":
 
     data_manager.destination_data = sheet_data
     data_manager.update_destination_iatacode()
+print("end of main")
