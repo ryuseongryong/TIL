@@ -15,5 +15,5 @@ class NotificationManager:
         self.client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
     def send_msg(self, msg):
-        msg = self.client.messages.create(body=msg, from_=FROM_PHONE, to=TO_PHONE)
-        print(msg.id)
+        message = self.client.messages.create(body=msg, from_=FROM_PHONE, to=TO_PHONE)
+        print(message)
