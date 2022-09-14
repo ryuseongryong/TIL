@@ -31,3 +31,9 @@ class DataManager:
                 headers=bearer_header,
             )
             print(res.text)
+
+    def get_customer_emails(self):
+        res = requests.get(SHEETY_ENDPOINT)
+        data = res.json()
+        self.customer_data = data["users"]
+        return self.customer_data
