@@ -2,6 +2,7 @@ import os, requests
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from flight_data import FlightData
+from pprint import pprint
 
 load_dotenv()
 
@@ -11,20 +12,24 @@ print(TEQUILA_API_KEY)
 
 
 class FlightSearch:
+    def __init__(self):
+        self.city_codes = []
+
     def get_destination_code(self, city_name):
         location_endpoint = f"{TEQUILA_ENDPOINT}/locations/query"
         headers = {"apikey": TEQUILA_API_KEY}
-        query = {"term": city_name, "location_types": "city"}
-        res = requests.get(url=location_endpoint, params=query, headers=headers)
-        # print(res.text)
-        # print(res.json())
-        data = res.json()["locations"]
-        iataCode = data[0]["code"]
-        return iataCode
+        for city in city_names:
+            query = {"term": city_name, "location_types": "city"}
+            res = requests.get(url=location_endpoint, params=query, headers=headers)
+            data = res.json()["locations"]
+            iataCode = data[0]["code"]
+            self.city_codes.append(iataCode)
+        return self.city_codes
 
     def check_flights(
         self, origin_city_code, destination_city_code, from_time, to_time
     ):
+        print(f"Check flights triggered for {destination_city_code}")
         headers = {"apikey": TEQUILA_API_KEY}
         query = {
             "fly_from": origin_city_code,
@@ -47,17 +52,39 @@ class FlightSearch:
         try:
             data = res.json()["data"][0]
         except IndexError:
-            print(f"No Flights found for {destination_city_code}!")
-            return None
+            query["max_stopovers"] = 1
+            res = requests.get(
+                url=f"{TEQUILA_ENDPOINT}/v2/search", headers=headers, params=query
+            )
+            try:
+                data = res.json()["data"][0]
+            except IndexError:
+                print(f"No Flights found for {destination_city_code}!")
+                return None
+            pprint(data)
 
-        flight_data = FlightData(
-            price=data["price"],
-            origin_city=data["route"][0]["cityFrom"],
-            origin_airport=data["route"][0]["flyFrom"],
-            destination_city=data["route"][0]["cityTo"],
-            destination_airport=data["route"][0]["flyTo"],
-            out_date=data["route"][0]["local_departure"].split("T")[0],
-            return_date=data["route"][0]["local_departure"].split("T")[0],
-        )
-        print(f"{flight_data.destination_city}: ₩{flight_data.price}")
-        return flight_data
+            flight_data = FlightData(
+                price=data["price"],
+                origin_city=data["route"][0]["cityFrom"],
+                origin_airport=data["route"][0]["flyFrom"],
+                destination_city=data["route"][0]["cityTo"],
+                destination_airport=data["route"][0]["flyTo"],
+                out_date=data["route"][0]["local_departure"].split("T")[0],
+                return_date=data["route"][0]["local_departure"].split("T")[0],
+                stop_overs=1,
+                via_city=data["route"][0]["cityTo"],
+            )
+            return flight_data
+        else:
+            flight_data = FlightData(
+                price=data["price"],
+                origin_city=data["route"][0]["cityFrom"],
+                origin_airport=data["route"][0]["flyFrom"],
+                destination_city=data["route"][0]["cityTo"],
+                destination_airport=data["route"][0]["flyTo"],
+                out_date=data["route"][0]["local_departure"].split("T")[0],
+                return_date=data["route"][0]["local_departure"].split("T")[0],
+            )
+
+            print(f"{flight_data.destination_city}: ₩{flight_data.price}")
+            return flight_data
