@@ -3,6 +3,17 @@ h1 {
     font-size: 100px;
 }
 
+
+/*
 img {
+    background-color: orange;
+}
+*/
+
+.bacon {
+    background-color: green;
+}
+
+.chicken {
     background-color: orange;
 }
