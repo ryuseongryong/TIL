@@ -4,11 +4,11 @@ h1 {
 }
 
 
-/*
-img {
-    background-color: orange;
+
+img:hover {
+    background-color: red;
 }
-*/
+
 
 .bacon {
     background-color: green;
@@ -16,4 +16,13 @@ img {
 
 .chicken {
     background-color: orange;
+}
+
+.circular {
+    border-radius: 100%;
+}
+
+#heading1 {
+    color: blue;
+    font-size: 200px;
 }
