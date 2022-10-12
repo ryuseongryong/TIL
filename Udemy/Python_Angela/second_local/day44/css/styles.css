@@ -33,6 +33,12 @@ h3 {
 }
 .bottom-container {
 }
+.skill-row {
+    width: 50%;
+    margin: 100px auto;
+    text-align: left;
+    line-height: 2;
+}
 .pro {
     text-decoration: underline;
 }
@@ -51,4 +57,18 @@ h3 {
     position: absolute;
     left: 300px;
     bottom: 300px;
+}
+.profile-img {
+    width: 30%;
+}
+.ceph-img {
+    width: 25%;
+    float: left;
+    margin-right: 30px;
+    margin-top: -60px;
+}
+.k8s-img {
+    width: 25%;
+    float: right;
+    margin-left: 30px;
 }
