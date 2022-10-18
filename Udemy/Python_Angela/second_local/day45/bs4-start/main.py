@@ -4,42 +4,47 @@ import lxml
 
 os.chdir("./Udemy/Python_Angela/second_local/day45/bs4-start")
 
+import requests
 
-with open("website.html") as file:
-    contents = file.read()
+res = requests.get("https://news.ycombinator.com/news")
+print(res.text)
 
-# soup = BeautifulSoup(contents, "lxml")
-soup = BeautifulSoup(contents, "html.parser")
-# print(soup.title)
-# print(soup.title.string)
 
-# print(soup.prettify())
+# with open("website.html") as file:
+#     contents = file.read()
 
-# print(soup.p)
+# # soup = BeautifulSoup(contents, "lxml")
+# soup = BeautifulSoup(contents, "html.parser")
+# # print(soup.title)
+# # print(soup.title.string)
 
-all_anchor_tags = soup.find_all(name="a")
-# print(all_anchor_tags)
+# # print(soup.prettify())
 
-for tag in all_anchor_tags:
-    # print(tag.getText())
-    # print(tag.get("href"))
-    pass
+# # print(soup.p)
 
-heading = soup.find(name="h1", id="name")
-# print(heading)
+# all_anchor_tags = soup.find_all(name="a")
+# # print(all_anchor_tags)
 
-section_heading = soup.find(name="h3", class_="heading")
-# print(section_heading.getText())
-# print(section_heading.get("class"))
+# for tag in all_anchor_tags:
+#     # print(tag.getText())
+#     # print(tag.get("href"))
+#     pass
 
-class_is_heading = soup.find_all(class_="heading")
-print(class_is_heading)
+# heading = soup.find(name="h1", id="name")
+# # print(heading)
 
-h3_heading = soup.find_all("h3", class_="heading")
-print(h3_heading)
+# section_heading = soup.find(name="h3", class_="heading")
+# # print(section_heading.getText())
+# # print(section_heading.get("class"))
 
-name = soup.select_one(selector="#name")
-print(name)
+# class_is_heading = soup.find_all(class_="heading")
+# print(class_is_heading)
 
-headings = soup.select(".heading")
-print(headings)
+# h3_heading = soup.find_all("h3", class_="heading")
+# print(h3_heading)
+
+# name = soup.select_one(selector="#name")
+# print(name)
+
+# headings = soup.select(".heading")
+# print(headings)
