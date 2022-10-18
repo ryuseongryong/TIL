@@ -7,7 +7,10 @@ os.chdir("./Udemy/Python_Angela/second_local/day45/bs4-start")
 import requests
 
 res = requests.get("https://news.ycombinator.com/news")
-print(res.text)
+yc_web_page = res.text
+
+soup = BeautifulSoup(yc_web_page, "html.parser")
+print(soup.title)
 
 
 # with open("website.html") as file:
