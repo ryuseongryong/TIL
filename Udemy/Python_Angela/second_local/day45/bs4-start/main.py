@@ -10,9 +10,14 @@ res = requests.get("https://news.ycombinator.com/news")
 yc_web_page = res.text
 
 soup = BeautifulSoup(yc_web_page, "html.parser")
-print(soup.title)
+print(yc_web_page)
+# print(soup.title)
+article_tag = soup.find(name="span", class_="titleline").find(name="a")
+article_text = article_tag.getText()
+print(article_text)
 
 
+# -------------------------------------------------------------------------------------------------------- #
 # with open("website.html") as file:
 #     contents = file.read()
 
