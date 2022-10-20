@@ -12,7 +12,11 @@ yc_web_page = res.text
 soup = BeautifulSoup(yc_web_page, "html.parser")
 # print(yc_webs_page)
 # print(soup.title)
-articles = soup.find_all(name="span", class_="titleline").find_all(name="a")
+titlelines = soup.find_all(name="span", class_="titleline")
+# print(titlelines[0].find(name="a"))
+
+
+articles = [titleline.find(name="a") for titleline in titlelines]
 article_texts = []
 article_links = []
 for article_tag in articles:
