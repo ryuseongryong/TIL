@@ -20,7 +20,7 @@ response = requests.get(url, headers=header)
 soup = BeautifulSoup(response.content, "lxml")
 print(soup.prettify())
 
-price = soup.find(class_="a-section a-spacing-none aok-align-center").get_text()
+price = soup.find(class_="priceToPay").get_text()
 # price = soup.find(id="priceblock_ourprice").get_text()
 price_without_currency = price.split("$")[1]
 price_as_float = float(price_without_currency)
@@ -40,5 +40,5 @@ if price_as_float < BUY_PRICE:
         connection.sendmail(
             from_addr=EMAIL,
             to_addrs=EMAIL,
-            msg=f"Subject:Amazon Price Alert!\n\n{message}\n{url}",
+            msg=f"Subject:Amazon Price Alert!\n\n{message}\n{url}".encode("utf-8"),
         )
