@@ -31,15 +31,24 @@ password_field.send_keys(Keys.ENTER)
 # ---
 
 time.sleep(5)
+
 apply_button = driver.find_element(By.CSS_SELECTOR, ".jobs-s-apply button")
 apply_button.click()
 
 # If application requires phone number and the field is empty, then fill in the number.
 time.sleep(5)
-phone = driver.find_element(By.CLASS_NAME, "fb-single-line-text__input")
-if phone.text == "":
-    phone.send_keys(PHONE)
+# phone = driver.find_element(By.CLASS_NAME, "fb-single-line-text__input")
+# if phone.text == "":
+#     phone.send_keys(PHONE)
+
+# next_button = driver.find_element(By.ID, "ember475")
+next_button = driver.find_element(By.CLASS_NAME, "artdeco-button--primary")
+next_button.click()
+
+time.sleep(5)
 
 # Submit the application
-submit_button = driver.find_element(By.CSS_SELECTOR, "footer button")
+# submit_button = driver.find_element(By.ID, "ember487")
 # submit_button.click()
+back_button = driver.find_element(By.CLASS_NAME, "artdeco-button--tertiary")
+back_button.click()
