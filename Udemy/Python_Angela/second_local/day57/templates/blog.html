@@ -11,5 +11,6 @@
         <h2>{{ blog_post["subtitle"] }}</h2>
         {% endif %}
     {% endfor %}
+    <a href="{{ url_for('get_blog', num=3) }}">Go To Blog</a>
 </body>
 </html>
