@@ -25,3 +25,5 @@ Pipfile*
 *.jpeg
 *.png
 *.txt
+
+**/*.db

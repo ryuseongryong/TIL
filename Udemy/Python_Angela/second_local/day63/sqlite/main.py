@@ -1,6 +1,6 @@
 # import sqlite3
 import os
-from flask import Flask
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 os.chdir("./Udemy/Python_Angela/second_local/day63/sqlite")
@@ -28,8 +28,8 @@ class Book(db.Model):
     author = db.Column(db.String(250), nullable=False)
     rating = db.Column(db.Float, nullable=False)
 
-    def __init__(self, id, title, author, rating):
-        self.id = id
+    def __init__(self, title, author, rating):
+        # self.id = id
         self.title = title
         self.author = author
         self.rating = rating
@@ -42,9 +42,23 @@ with app.app_context():
 
     db.create_all()
 
-    new_book = Book(id=1, title="Harry Potter2", author="J. K. Rowling", rating=9.3)
-    db.session.add(new_book)
-    db.session.commit()
 
-# if __name__ == "__main__":
-#     app.run(debug=True)
+@app.route("/add", method=["GET", "POST"])
+def add():
+    if request.method == "POST":
+        new_book = Book(
+            title=request.form["title"],
+            author=request.form["author"],
+            rating=request.form["rating"],
+        )
+        with app.app_context():
+            db.session.add(new_book)
+            db.session.commit()
+            return redirect(url_for("home"))
+    return render_template("add.html")
+
+
+# with app.app_context():
+#     new_book = Book(id=2, title="Harry Potter3", author="J. K. Rowling", rating=9.9)
+#     db.session.add(new_book)
+#     db.session.commit()
