@@ -84,9 +84,8 @@ def rate_movie():
     if form.validate_on_submit():
         movie.rating = float(form.rating.data)
         movie.review = form.review.data
-        with app.app_context():
-            db.session.commit()
-            return redirect(url_for("home"))
+        db.session.commit()
+        return redirect(url_for("home"))
     return render_template("edit.html", movie=movie, form=form)
 
 
@@ -101,9 +100,30 @@ def add_movie():
             params={"api_key": MOVIE_DB_API_KEY, "query": movie_title},
         )
         data = response.json()["results"]
+        print(data)
         return render_template("select.html", options=data)
 
     return render_template("add.html", form=form)
+
+
+@app.route("/find")
+def find_movie():
+    movie_api_id = request.args.get("id")
+    if movie_api_id:
+        movie_api_url = f"{MOVIE_DB_INFO_URL}/{movie_api_id}"
+        response = requests.get(
+            movie_api_url, params={"api_key": MOVIE_DB_API_KEY, "language": "en-US"}
+        )
+        data = response.json()
+        new_movie = Movie(
+            title=data["title"],
+            year=data["release_date"].split("-")[0],
+            img_url=f"{MOVIE_DB_IMAGE_URL}{data['poster_path']}",
+            description=data["overview"],
+        )
+        db.session.add(new_movie)
+        db.session.commit()
+        return redirect(url_for("rate_movie", id=new_movie.id))
 
 
 @app.route("/delete")
