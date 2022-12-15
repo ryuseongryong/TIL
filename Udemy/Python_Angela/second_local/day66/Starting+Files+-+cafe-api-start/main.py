@@ -4,8 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 
 ##Connect to Database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cafes.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///cafes.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
 
@@ -27,7 +27,12 @@ class Cafe(db.Model):
 @app.route("/")
 def home():
     return render_template("index.html")
-    
+
+
+@app.route("/random", methods=["GET"])
+def get_random_cafe():
+    pass
+
 
 ## HTTP GET - Read Record
 
@@ -38,5 +43,5 @@ def home():
 ## HTTP DELETE - Delete Record
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
