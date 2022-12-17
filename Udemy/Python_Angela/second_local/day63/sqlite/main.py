@@ -43,7 +43,7 @@ with app.app_context():
     db.create_all()
 
 
-@app.route("/add", method=["GET", "POST"])
+@app.route("/add", methods=["GET", "POST"])
 def add():
     if request.method == "POST":
         new_book = Book(

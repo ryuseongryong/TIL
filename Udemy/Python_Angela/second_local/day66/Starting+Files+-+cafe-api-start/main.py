@@ -1,12 +1,18 @@
 from flask import Flask, jsonify, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 import random
+import os
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+print(basedir)
+# os.chdir("./Udemy/Python_Angela/second_local/day66/Starting+Files+-+cafe-api-start")
 
 app = Flask(__name__)
 
-##Connect to Database
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///cafes.db"
+## Connect to Database
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "cafes.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
 db = SQLAlchemy(app)
 
 
