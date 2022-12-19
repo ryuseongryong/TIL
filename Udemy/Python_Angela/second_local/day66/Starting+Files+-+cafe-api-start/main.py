@@ -30,6 +30,11 @@ class Cafe(db.Model):
     can_take_calls = db.Column(db.Boolean, nullable=False)
     coffee_price = db.Column(db.String(250), nullable=True)
 
+    def to_dict(self):
+        return {
+            column.name: getattr(self, column.name) for column in self.__table__.columns
+        }
+
 
 @app.route("/")
 def home():
@@ -62,6 +67,18 @@ def get_all_cafes():
     cafes = db.session.query(Cafe).all()
     # This uses a List Comprehension but you could also split it into 3 lines.
     return jsonify(cafes=[cafe.to_dict() for cafe in cafes])
+
+
+@app.route("/search")
+def get_cafe_at_location():
+    query_location = request.args.get("loc")
+    cafe = db.session.query(Cafe).filter_by(location=query_location).first()
+    if cafe:
+        return jsonify(cafe=cafe.to_dict())
+    else:
+        return jsonify(
+            error={"Not Found": "Sorry, we don't have a cafe at that location."}
+        )
 
 
 ## HTTP GET - Read Record
