@@ -36,7 +36,15 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(1000))
 
 
-# Line below only required once, when creating DB.
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+
 # db.create_all()
 
 
@@ -61,6 +69,8 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
+        login_user(new_user)
+
         return redirect(url_for("secrets"))
 
     return render_template("register.html")
@@ -68,17 +78,28 @@ def register():
 
 @app.route("/login")
 def login():
+    if request.method == "POST":
+        email = request.form.get("email")
+        password = request.form.get("password")
+
+        user = User.query.filter_by(email=email).first()
+
+        if check_password_hash(user.password, password):
+            login_user(user)
+            return redirect(url_for("secrets"))
     return render_template("login.html")
 
 
 @app.route("/secrets")
 def secrets():
-    return render_template("secrets.html")
+    print(current_user.name)
+    return render_template("secrets.html", name=current_user.name)
 
 
 @app.route("/logout")
 def logout():
-    pass
+    logout_user()
+    return redirect(url_for("home"))
 
 
 @app.route("/download")
