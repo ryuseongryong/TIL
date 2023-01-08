@@ -26,3 +26,15 @@ clean_df["Starting Median Salary"].idxmax()
 clean_df["Undergraduate Major"].loc[43]
 clean_df["Undergraduate Major"][43]
 clean_df.loc[43]
+
+# 특정 열에 접근2
+print(clean_df["Mid-Career Median Salary"].max())
+print(
+    f"Index for the max mid career salary: {clean_df['Mid-Career Median Salary'].idxmax()}"
+)
+clean_df["Undergraduate Major"][8]
+
+print(clean_df["Starting Median Salary"].min())
+clean_df["Undergraduate Major"].loc[clean_df["Starting Median Salary"].idxmin()]
+
+clean_df.loc[clean_df["Mid-Career Median Salary"].idxmin()]
