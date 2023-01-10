@@ -58,3 +58,11 @@ clean_df.head()
 
 low_risk = clean_df.sort_values("Spread")
 low_risk[["Undergraduate Major", "Spread"]].head()
+
+highest_potential = clean_df.sort_values(
+    "Mid-Career 90th Percentile Salary", ascending=False
+)
+highest_potential[["Undergraduate Major", "Mid-Career 90th Percentile Salary"]].head()
+
+highest_spread = clean_df.sort_values("Spread", ascending=False)
+highest_spread[["Undergraduate Major", "Spread"]].head()
