@@ -66,3 +66,5 @@ highest_potential[["Undergraduate Major", "Mid-Career 90th Percentile Salary"]].
 
 highest_spread = clean_df.sort_values("Spread", ascending=False)
 highest_spread[["Undergraduate Major", "Spread"]].head()
+
+clean_df.groupby("Group").count()
