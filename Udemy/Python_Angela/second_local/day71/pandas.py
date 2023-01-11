@@ -68,3 +68,4 @@ highest_spread = clean_df.sort_values("Spread", ascending=False)
 highest_spread[["Undergraduate Major", "Spread"]].head()
 
 clean_df.groupby("Group").count()
+pd.options.display.float_format = "{:,.2f}".format
