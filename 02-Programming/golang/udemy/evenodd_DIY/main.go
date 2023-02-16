@@ -12,9 +12,9 @@ func main() {
 		}
 
 		if isEven {
-			fmt.Println(num, " is even")
+			fmt.Println(num, "is even")
 		} else if !isEven {
-			fmt.Println(num, " is odd")
+			fmt.Println(num, "is odd")
 		}
 
 	}
