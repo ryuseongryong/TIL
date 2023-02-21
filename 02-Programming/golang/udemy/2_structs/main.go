@@ -9,20 +9,28 @@ type contactInfo struct {
 type person struct {
 	firstName string
 	lastName  string
-	contact   contactInfo
+	contactInfo
 }
 
 func main() {
 	jim := person{
 		firstName: "Jim",
 		lastName:  "Party",
-		contact: contactInfo{
+		contactInfo: contactInfo{
 			email:   "jim@gmail.com",
 			zipCode: 94000,
 		},
 	}
+	jim.updateName("jimmy")
+	jim.print()
+}
 
-	fmt.Printf("%+v", jim)
+func (p person) updateName(newFirstName string) {
+	p.firstName = newFirstName
+}
+
+func (p person) print() {
+	fmt.Printf("%+v", p)
 }
 
 // type     | default value
@@ -41,3 +49,5 @@ func main() {
 //      	 alex.lastName = "Anderson"
 //      	 fmt.Println(alex)
 //      	 fmt.Printf("%+v", alex)
+
+// struct type can be use value as own struct key
