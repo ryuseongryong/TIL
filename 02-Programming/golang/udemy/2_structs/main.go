@@ -34,6 +34,22 @@ func (p person) print() {
 	fmt.Printf("%+v", p)
 }
 
+// different between struct type and array for pointers
+// package main
+
+// import "fmt"
+
+// func main() {
+// 	mySlice := []string{"Hi", "There", "How", "Are", "you"}
+// 	updateSlice(mySlice)
+// 	fmt.Println(mySlice)
+
+// }
+
+// func updateSlice(s []string) {
+// 	s[0] = "Bye"
+// }
+
 // type     | default value
 // string   | 0
 // float    | 0

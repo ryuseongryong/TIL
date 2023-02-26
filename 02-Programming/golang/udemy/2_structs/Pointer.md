@@ -31,6 +31,7 @@ jim.updateName("jimmy')
 func(pointerToPerson *Person) updateName() 
 ## *person : Type of *person, or a pointer to a person
 ```
+- receiver의 type과 변수의 type이 일치하면 자동으로 변수를 포인터로 전환해줌
 
 # *(asterisk) operator
 - `*pointer` 형식으로 사용
