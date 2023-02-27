@@ -35,6 +35,22 @@ func (p person) print() {
 }
 
 // different between struct type and array for pointers
+
+//          Arrays          |        Slices
+// Primitive data structure | Can grow and shrink
+// Can't be resized         | Used 99% of the time for lists of elements
+// Rarely used directly
+
+// Value Types | Reference Types
+//     int     |    slices
+//    float    |      maps
+//    string   |    channels
+//     bool    |    pointers
+//    structs  |    functions
+// Value Types : Use pointers to change these things in a function
+// Reference Types : Don't worry about pointers with these
+
+// --------codes--------
 // package main
 
 // import "fmt"
@@ -49,6 +65,7 @@ func (p person) print() {
 // func updateSlice(s []string) {
 // 	s[0] = "Bye"
 // }
+// --------codes done--------
 
 // type     | default value
 // string   | 0
