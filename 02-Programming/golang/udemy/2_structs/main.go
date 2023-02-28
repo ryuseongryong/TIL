@@ -85,3 +85,22 @@ func (p person) print() {
 //      	 fmt.Printf("%+v", alex)
 
 // struct type can be use value as own struct key
+
+// --------codes--------
+// package main
+
+// import "fmt"
+
+// func main() {
+//  name := "bill"
+
+//  namePointer := &name
+
+//  fmt.Println(&namePointer)
+//  printPointer(namePointer)
+// }
+
+// func printPointer(namePointer *string) {
+//  fmt.Println(&namePointer)
+// }
+// --------codes done--------
