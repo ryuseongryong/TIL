@@ -86,6 +86,7 @@ func (p person) print() {
 
 // struct type can be use value as own struct key
 
+// 항상 값을 복사하기 떄문에 주소에 대한 변수 또한 새로운 주소에 할당됨
 // --------codes--------
 // package main
 
