@@ -7,3 +7,19 @@ func (s []float64) shuffle()
 func (s []string) shuffle()
 func (s []int) shuffle()
 ```
+
+### interface type description as diagram
+```
+type englishBot struct
+func (englishBot) getGreeting() string
+
+type spanishBot struct
+func (spanishBot) getGreeting() string
+```
+
+```
+type bot interface{ // >> honorary type
+    getGreeting() string // when getGreeting function return string, that type is automatically promote type bot
+}
+func printGreeting(b bot)
+```
