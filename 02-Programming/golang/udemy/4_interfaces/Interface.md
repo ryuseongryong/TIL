@@ -23,3 +23,18 @@ type bot interface{ // >> honorary type
 }
 func printGreeting(b bot)
 ```
+
+### complex interface type
+```
+// bot is interface name
+type bot interface {
+    // getGreeting is function name
+    // (string, int) are List of argument types
+    // (string, error) are List of return types
+    getGreeting(string, int) (string, error)
+}
+```
+
+### Concrete Type vs Interface Type
+- Concrete Type : map, struct, int, string, englishBot
+- Interface Type : bot
