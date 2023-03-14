@@ -38,3 +38,9 @@ type bot interface {
 ### Concrete Type vs Interface Type
 - Concrete Type : map, struct, int, string, englishBot
 - Interface Type : bot
+
+### etc.
+- Interfaces are not generic type : Other languages have 'generic' types(go doesn't)
+- Interfaces are implicit : no need to say manually custom type satisfies some interface
+- Interfaces are a contract to help us manage types : Garbage In -> Garbage Out, If our custom type's implementation of a function is broken then interfaces wont help us
+- Interfaces are tough. Step #1 is undertanding how to read them : Understand how to read interfaces in the standard lib. Writing your own interfaces are tough and requires experience
