@@ -71,3 +71,17 @@ Thing to read data into
 Real source of data
 ```
 => Read
+
+### Writer Interface
+[]byte -> Write -> Some form of Output
+
+Input |  		Returns 		 | Source of Output
+--|--|--
+[]byte | Writer | HTTP Req Bocy       	 		 	 		 
+[]byte | Writer | Text file on hard drive  			 		 
+[]byte | Writer | Image file on hard drive 			 		 
+[]byte | Writer | User entering text into command line 		 
+[]byte | Writer | Data from analog sensor plugged into machine 
+
+- Writer Interface describes something that can take into and send it outside of our program
+- We need to find something in the standard library that implements the Writer interface, and use that to log out all the data that we're receiving from the Reader
