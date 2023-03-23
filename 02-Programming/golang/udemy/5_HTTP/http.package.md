@@ -85,3 +85,7 @@ Input |  		Returns 		 | Source of Output
 
 - Writer Interface describes something that can take into and send it outside of our program
 - We need to find something in the standard library that implements the Writer interface, and use that to log out all the data that we're receiving from the Reader
+
+### io.Copy
+- Something that implements the Writer interface -> os.Stdout -> value of type File -> File has a function called Write -> Therefore, it implements the Write interface
+- Something that implements the Reader interface -> resp.Body
