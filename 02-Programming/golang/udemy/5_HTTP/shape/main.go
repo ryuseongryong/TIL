@@ -29,10 +29,13 @@ func main() {
 	nt := triangle{
 		base:   4.5,
 		height: 5.5,
-	},
+	}
 
 	ns := square{
 		sideLength: 6.6,
-	},
-	
+	}
+
+	nt.getArea()
+	ns.getArea()
+
 }
