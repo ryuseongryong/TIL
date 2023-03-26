@@ -30,4 +30,9 @@ func main() {
 		base:   4.5,
 		height: 5.5,
 	},
+
+	ns := square{
+		sideLength: 6.6,
+	},
+	
 }
