@@ -22,6 +22,19 @@ One CPU Core0 One CPU Core1 One CPU Core2
 
 Go Routine0 Go Routine1 Go Routine2
 ```
+- by default, Go tries to use one core
+- Scheduler runs one thread on each logical core
+
+### Concurrency
+- we can have multiple threads executing code. If one thread blocks, another one is picked up and worked on
+
+### Parallelism
+- Multiple threads executed at the executed at the exact same time. Requires multiple CPU's
+
+## Bug
+- Main Routine : main routine created when we launched our program
+- Child go routine : child routines created by the go keyword
+- these are crash?
 
 # Go Routine
 - Go runtime이 관리하는 가상 thread
