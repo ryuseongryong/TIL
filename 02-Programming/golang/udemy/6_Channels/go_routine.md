@@ -1,3 +1,28 @@
+# Intro
+```
+go checkLink(link)
+go : Create a new thread go routine
+function : run this function with it
+```
+
+# Go Scheduler
+```
+            One CPU Core
+
+            Go Scheduler
+
+Go Routine0 Go Routine1 Go Routine2
+```
+- Scheduler runs one routine until it finishes or makes a blocking call(like an HTTP request)
+
+```
+One CPU Core0 One CPU Core1 One CPU Core2 
+
+            Go Scheduler
+
+Go Routine0 Go Routine1 Go Routine2
+```
+
 # Go Routine
 - Go runtime이 관리하는 가상 thread
 - go 키워드를 사용하여 함수를 호출하면 런타임 시 새로운 goroutine을 실행
