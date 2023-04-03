@@ -35,6 +35,20 @@ Go Routine0 Go Routine1 Go Routine2
 - Main Routine : main routine created when we launched our program
 - Child go routine : child routines created by the go keyword
 - these are crash?
+```
+| <-- program started
+| ----- Main Routine ----- |                |
+|       | ----- Child go routine ----- |    |
+|       | ----- Child go routine -- |       |
+|       | ----- Child go routine ------- |  |
+- main routine : single routine inside the program determines the end point. own job is done early, then child go routines can't run. so channel need.
+```
+
+# Channel
+```
+Main Routine <---> Channel <---> child go routine
+(type string)    (type string)     (type string)
+```
 
 # Go Routine
 - Go runtime이 관리하는 가상 thread
