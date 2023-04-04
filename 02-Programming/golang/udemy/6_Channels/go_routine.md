@@ -49,7 +49,12 @@ Go Routine0 Go Routine1 Go Routine2
 Main Routine <---> Channel <---> child go routine
 (type string)    (type string)     (type string)
 ```
-
+## Sending data with Channels
+```
+myNumber    <-
+                >- channel <- 5
+fmt.Println <-
+```
 # Go Routine
 - Go runtime이 관리하는 가상 thread
 - go 키워드를 사용하여 함수를 호출하면 런타임 시 새로운 goroutine을 실행
