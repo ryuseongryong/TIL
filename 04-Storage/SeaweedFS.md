@@ -30,6 +30,26 @@
 - 파일러 서비스와 유사한 AWS style S3 버킷을 제공함
 - 별도로 시작하거나 파일러와 함께 시작할 수 있음
 
+## Functions
+### Cloud Tier
+- 클라우드 티어가 있는 계층형 스토리지
+- seaweedFS가 전체 볼륨 파일을 클라우드 스토리지로 이동하므로 1GB의 크기까지 가능
+- filer 데이터 암호화를 투명하게 지원함
+- 클라우드에 업로드된 청크 파일은 seaweedFS외부에서 사용할 수 없음
+- Design
+    - 하나의 볼륨이 클라우드에 tiering된 경우
+        - 볼륨은 읽기전용으로 표시
+        - 인덱스 파일은 로컬에 유지
+        - .dat 파일이 클라우드로 이동됨
+        - 원격 파일에 동일한 O(1) read가 적용, 파일 항목을 요청할 떄, 단일 범위 요청으로 항목의 컨텐츠를 검색
+- Benefits
+    - Cheaper
+    - Faster
+- Usage
+    ```
+    volume.tier.upload -dest s3 -fullPercent=95 -quietFor=1h
+    ```
+
 ## FAQ
 ### 얼마나 많은 볼륨이 필요한가?
 - SeaweedFS의 볼륨은 일반적인 storage에서 사용되는 볼륨과 다르다. 데이터 배치, 복제, 수집, 디스크 유형, S3 버킷, TTL, CSI 마운트 등 모두 볼륨을 기반으로 동작한다. 따라서 `no free volumes left` 에러가 발생하면 볼륨을 추가해줘야 한다. 
