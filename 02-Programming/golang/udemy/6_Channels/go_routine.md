@@ -55,6 +55,15 @@ myNumber    <-
                 >- channel <- 5
 fmt.Println <-
 ```
+
+## blocking channels
+```
+| <-- program started      | <-- for loop complete, waiting channel  <-- main routine prints value, no more code to run
+| ----- Main Routine ----- |                   | Main Routine |
+|                         | ----- google ----- |                            |
+|                           | ----- facebook go routine -- |                |
+|                               | ----- amazon go routine ------- |         |
+```
 # Go Routine
 - Go runtime이 관리하는 가상 thread
 - go 키워드를 사용하여 함수를 호출하면 런타임 시 새로운 goroutine을 실행
