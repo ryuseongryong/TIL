@@ -62,7 +62,7 @@ fmt.Println <-
                                                               |<-- main routine prints value, no more code to run, exit
 | ----- Main Routine ----- |                   | Main Routine |
 |                         | ----- google ----- |                            |
-|                           | ----- facebook go routine -- |                |
+|                           | ----- facebook go routine ---- |              |
 |                               | ----- amazon go routine ------- |         |
 ```
 # Go Routine
