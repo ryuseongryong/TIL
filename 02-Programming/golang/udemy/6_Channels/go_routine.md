@@ -58,7 +58,8 @@ fmt.Println <-
 
 ## blocking channels
 ```
-| <-- program started      | <-- for loop complete, waiting channel  <-- main routine prints value, no more code to run
+| <-- program started      | <-- for loop complete, waiting channel  
+                                                              |<-- main routine prints value, no more code to run, exit
 | ----- Main Routine ----- |                   | Main Routine |
 |                         | ----- google ----- |                            |
 |                           | ----- facebook go routine -- |                |
