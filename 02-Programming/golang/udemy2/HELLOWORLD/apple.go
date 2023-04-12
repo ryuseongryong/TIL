@@ -2,6 +2,6 @@ package apple
 
 import "fmt"
 
-func main() {
+func apple() {
 	fmt.Println("Hi there!")
 }
