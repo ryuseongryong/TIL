@@ -42,6 +42,43 @@ roles/
     - templates/main.yml : roles이 배포하는 템플릿
     - meta/main.yml : roles 종속성 및 지원되는 플랫폼과 같은 선택적 Galaxy 메타데이터를 포함한 역할의 메타데이터
 
+- 일부 디렉터리에 다른 YAML 파일을 추가할 수 있음. e.g. 플랫폼별 작업을 별도의 파일에 배치하고 tasks/main.yml 파일에서 참조할 수 있다.(`import_tasks`)
+- roles에는 library라는 디렉터리에 모듈, 기타 플러그인 types도 포함될 수 있음.
 
+## Storing and finding roles
+- 기본적으로 ansible은 다음의 위치에서 roles를 찾아서 실행한다.
+    - collections을 사용하는 경우, collections에서 찾음
+    - playbook file 기준으로 roles/ 디렉터리에서 찾음
+    - 기본 검색 경로 : `~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles`
+    - playbook file이 있는 디렉터리에서 찾음
+
+- roles를 다른 위치에 저장하는 경우 ansible에서 roles를 찾을 수 있도록 roles_path 구성 옵션을 설정할 수 있다. shared roles을 단일 위치로 확인하면 여러 playbooks에서 더 쉽게 사용할 수 있음.
+
+- 또는 정규화된 경로를 사용하여 roles를 호출할 수 있음.
+
+## Using roles
+- roles는 3가지 방법으로 사용할 수 있다.
+    - roles option을 사용하여 play 수준에서 사용(play에서 사용되는 고전적인 roles 사용 방법)
+    - include_role을 사용하여 tasks 수준에서 사용(include_role을 사용하여 play의 tasks 섹션에서 roles를 동적으로 재사용 가능)
+    - import_role을 tasks 수준에서 사용(import_role을 사용하여 play의 tasks 섹션에서 roles를 정적으로 재사용)
+
+### Using roles at the play level
+- roles를 사용하는 고전적인 방법은 주어진 플레이에 대한 roles 옵션을 사용하는 것
+```
+---
+- hosts: webservers
+  roles:
+    - common
+    - webservers
+```
+- play 수준에서 roles 옵션을 사용하는 경우 각 roles에 대해 X로 표시됨
+    - `roles/x/tasks/main.yml`이 존재하면, ansible은 해당 파일에 있는 tasks를 play에 추가함
+    - `roles/x/handlers/main.yml`이 존재하면, ansible은 해당 파일에 있는 handlers를 play에 추가함
+    - `roles/x/vars/main.yml` / `roles/x/defaults/main.yml`이 존재하면, ansible은 해당 파일에 있는 변수를 play에 추가함
+    - `roles/x/meta/main.yml`이 존재하면, ansible은 해당 파일에 있는 role dependency를 roles list에 추가함
+    - 모든 복사본, 스크립트, 템플릿, include tasks(in the role)은 상대적 또는 절대적 경로를 지정하지 않고도 roles/x/{files,templates,tasks}/dir에 있는 파일을 참조할 수 있음.
+
+## References
 - https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html#role-directory-structure
+- https://www.digitalocean.com/community/tutorials/how-to-use-ansible-roles-to-abstract-your-infrastructure-environment
 
