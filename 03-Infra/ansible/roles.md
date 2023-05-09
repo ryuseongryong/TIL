@@ -78,6 +78,41 @@ roles/
     - `roles/x/meta/main.yml`이 존재하면, ansible은 해당 파일에 있는 role dependency를 roles list에 추가함
     - 모든 복사본, 스크립트, 템플릿, include tasks(in the role)은 상대적 또는 절대적 경로를 지정하지 않고도 roles/x/{files,templates,tasks}/dir에 있는 파일을 참조할 수 있음.
 
+- playbook 수준에서 roles 옵션을 사용하면 ansible은 role을 정적 임포트로 처리하고 playbook 파싱 중에 처리한다. ansible이 play를 실행하는 순서는 다음과 같다.
+    - play에 정의된 모든 pre_tasks
+    - pre_tasks에 의해 트리거된 모든 handlers
+    - roles에 나열된 각 role은 나열된 순서대로 실행됨. role의 `meta/main.yml`에 정의된 모든 role 종속성은 태그 필터링 및 조건에 따라 먼저 실행된다.
+    - play에 정의된 모든 tasks
+    - roles 또는 tasks에 의해 트리거 되는 모든 handlers
+    - play에 정의된 모든 post_tasks
+    - post_tasks에 의해 트리거되는 모든 handlers
+
+- role의 task와 함께 태그를 사용하는 경우에는 특히 pre_tasks, post_tasks 및 role dependencies가 중단 기간 제어 또는 부하 분산 모니터링에 사용되는 경우 pre_tasks, post_tasks, role dependencies에도 태그를 지정하여 함께 전달해야 함.
+
+- roles option에 다른 키워드도 전달할 수 있음
+    ```
+    ---
+    - hosts: webservers
+    roles:
+        - common
+        - role: foo_app_instance
+        vars:
+            dir: '/opt/a'
+            app_port: 5000
+        tags: typeA
+        - role: foo_app_instance
+        vars:
+            dir: '/opt/b'
+            app_port: 5001
+        tags: typeB
+    ```
+
+- roles 옵션에 태그를 추가하면 ansible은 역할 내의 모든 작업에 태그를 적용함
+- playbook의 섹션 roles 내에서 변수를 사용하는 경우 변수가 play 변수에 추가되어 역할 전후의 play 내의 모든 작업에서 사용할 수 있게 됨. `DEFAULT_PRIVATE_ROLE_VARS`로 수정 가능
+
+
+
+
 ## References
 - https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html#role-directory-structure
 - https://www.digitalocean.com/community/tutorials/how-to-use-ansible-roles-to-abstract-your-infrastructure-environment
