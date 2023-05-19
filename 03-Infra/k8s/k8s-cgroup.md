@@ -239,8 +239,9 @@
 
   ```
 - 파드 매니페스트에서 cgroupfs까지 전체 propagation과 translation에 대한 최종 요약은 아래 표와 같다.
+
 |     Pod Spec    |  Systemd           | Cgroups FS | Cadvisor Metric                    |
-| --------------- | ------------------ | ---------- | ---------------------------------  |
+|-----------------|--------------------|------------|------------------------------------|
 | requests.memory |	MemoryMin          | memory.max | container_spec_memory_limit_bytes  |
 | limits.memory   | MemoryMax          | memory.max | container_spec_memory_limit_bytes  |
 | requests.cpu    |	CPUWeight          | cpu.weight | container_spec_cpu_shares          |
