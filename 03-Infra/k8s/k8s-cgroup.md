@@ -246,3 +246,9 @@
 | limits.memory   | MemoryMax          | memory.max | container_spec_memory_limit_bytes  |
 | requests.cpu    |	CPUWeight          | cpu.weight | container_spec_cpu_shares          |
 | limits.cpu      |	CPUQuotaPerSecUSec | cpu.max    | container_spec_cpu_quota (_period) |
+
+## Why should you care?
+- Kubernetes의 cgroups에 대한 모든 새로운 지식을 습득하고 나면 "Linux와 Kubernetes가 모든 작업을 자동으로 처리해 주는데 왜 굳이 이것을 배워야 하는지"라는 의문이 들 수 있다.
+- 그 이유는 더 깊이 이해하는 것이 항상 도움이 되고, 디버깅을 위해 이 지식이 언제든 필요할 수 있다는 것이다. 그리고 더 중요한 것은 작동 방식을 알면 몇 가지 고급 기능을 구현하고 활용할 수 있다는 것이다.
+  - 예를 들어 앞에서 간략하게 언급했던 메모리 QoS가 있다. 대부분의 사람들이 이 사실을 모르지만, 쿠버네티스 v1.26 기준 파드 매니페스트의 메모리 Request는 컨테이너 런타임에 의해 고려되지 않으므로 사실상 무시된다.
+  - 또한 메모리 사용량을 조절할 수 있는 방법이 없고 컨테이너가 메모리 제한에 도달하면 단순히 OOM이 종료된다. 현재 알파 버전에 있는 메모리 QoS 기능의 도입으로 쿠버네티스는 컨테이너를 바로 종료하는 대신 추가적인 cgroup 파일 `memory.min` 및 `memory.high`를 활용하여 컨테이너를 스로틀링 할 수 있다. (앞의 예제에서는 `memory.min` 값은 클러스터에서 메모리 QoS가 활성화되었기 때문에 채워져 있다.)
