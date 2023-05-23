@@ -29,6 +29,10 @@ Characters
 - i32를 char로 캐스팅할 수 없지만, i32를 u8으로 캐스팅할 수 있다. 그런 다음 u8에서 char로 동일한 작업을 수행할 수 있다. 따라서 한 줄에서 as를 사용하여 u8으로 만들고 다시 char로 만들 수 있다.
 - i32 -> char (X)
 - i32 -> u8 -> char (O)
+- "" -> string
+- '' -> char
+- casting = simple type change using 'as'
+
 ```
 fn main() { // main() is where Rust programs start to run. Code goes inside {} (curly brackets)
 
@@ -67,5 +71,9 @@ fn main() {
     let third_number = my_number + my_other_number;
 }
 --> mismatched types
+
+
+
+
 
 */
