@@ -39,3 +39,16 @@
 //  - No Data Races
 //      - Rust가 보장하는 사실 중 최대 장점은 코드가 컴파일되면 더 이상 데이터 레이스가 발생하지 않는다는 것이다.
 //      - 이것은 복잡한 비동기 코드 작성을 위한 게임 체인저이다.
+
+// installation
+// $curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+// $source "$HOME/.cargo/env"
+// $rustc --version
+// rustc 1.69.0 (84c898d65 2023-04-16)
+// $cargo --version
+// cargo 1.69.0 (6e9a83356 2023-04-12)
+// $rustc --version
+// rustc 1.69.0 (84c898d65 2023-04-16)
+
+// https://www.rust-lang.org/tools
+// 
