@@ -58,6 +58,7 @@ FUNCTION stack_only(INTEGER b) {
 FUNCTION stack_and_heap {
     INTEGER d = 5
     POINTER e = ALLOCATE INTEGER 7
+    DEALLOCATE e // <-- 힙 메모리 할당을 해제하는 것이 필수이다.
 }
 // stack
 // main -> 'a=2' -> stack_only -> 'b=2,c=3' -> stack_and_heap -> 'd=5,e=0xf578bb60'
@@ -66,4 +67,6 @@ FUNCTION stack_and_heap {
 // 힙에 메모리를 저장하고 스택에 해당 값의 주소를 저장하고 함수에서 참조할 수 있게 함
 // 하지만 힙에는 메모리를 수동으로 할당해야 함
 // 또한 사용이 끝나면 수동으로 해제해야 함
-// 위의 경우에는 할당을 해제하지 않아서 메모리 누수가 발생한 것.
+// 위의 경우에는 할당을 해제하지 않음.
+// 따라서 스택과 힙의 함수가 종료되면 스택 프레임이 사라지고 포인터도 사라져 다시 힙에 접근할 수 없음.
+// 메모리 누수가 발생한 것.
