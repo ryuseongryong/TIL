@@ -102,3 +102,4 @@ FUNCTION stack_and_heap {
 // main -> 'a=2' -> stack_only -> 'b=2,c=3' -> stack_and_heap -> 'd=5,e=SM(0xf578bb60)'
 // heap : point와 값을 저장
 // '0xf578bb60=>7'
+// 스택 프레임이 종료되면 스마트 포인터도 함께 사라짐
