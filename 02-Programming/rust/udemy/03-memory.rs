@@ -103,3 +103,49 @@ FUNCTION stack_and_heap {
 // heap : point와 값을 저장
 // '0xf578bb60=>7'
 // 스택 프레임이 종료되면 스마트 포인터도 함께 사라짐
+
+// ------------------------------------------------------------------------------------------------
+
+list main.rs:0
+fn main() {
+    // Integer 지역 변수 a를 생성해서
+    let a = 2;
+    // stack_only 함수에 전달
+    let result = stack_only(a);
+    dbg!(result);
+}
+
+// stack_only 함수는 정수형 값을 받는다.
+// i32 타입은 Integer 32bit를 뜻한다.
+fn stack_only(b: i32) -> i32 {
+    // 지역변수 c를 생성한다.
+    let c = 3;
+    // stack_and_heap 함수를 호출한다.
+    return b + c + stack_and_heap();
+}
+
+fn stack_and_heap() -> i32 {
+    // 지역변수 d 생성
+    let d = 5;
+    // Box 생성 및 7 전달
+    // Box는 러스트의 스마트 포인터 타입
+    let e = Box::new(7);
+    return d + *e;
+}
+
+// 이 프로그램이 실행되면 heap에 메모리 할당
+// 영역을 벗어나게되면 할당된 메모리를 해제
+
+// stack_only 함수가 실행될 때, 
+// #0 stack_and_heap::stack_only (b=2) at stack-and-heap/src/main.rs:8
+// #1 0x000055555555869b in stack_and_heap::main () at stack-and-heap/src/main.rs:3
+// (More stack frames follow...)
+//스택 프레임 위에 stack_only 함수가 있음
+// 그것은 main 함수 위의 스택 프레임에 위치하는데 main 함수가 호출한 함수이다.
+// 지역 변수는 없는 상태(함수가 있는 스택 프레임에만 접근할 수 있어서 이전 함수에 있는 지역 변수에는 접근할 수 없음)
+// 인수 b는 2로 설정되어 있음(함수가 호출한 인자, main함수에서 전달됨)
+// 지역변수를 설정하는 부분(let c = 3;)을 지나면 지역 변수 c가 설정됨
+
+// stack_and_heap 함수가 실행될 때,
+
+
