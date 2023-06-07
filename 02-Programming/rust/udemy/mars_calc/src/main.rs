@@ -1,7 +1,8 @@
 // main 함수는 항상 러스트 파일이 실행될 때 제일 먼저 실행되는 코드
 fn main() {
-    println!("Hello, world!");
-    calculate_weight_on_mars(100.0);
+    // println! 는 매크로, !가 붙어있으면 매크로라는 의미
+    // cargo expand로 확인 가능
+    println!("Weight on Mars: {}kg", calculate_weight_on_mars(100.0));
 }
 
 // 러스트 코드는 함수와 변수명을 작성할 때 스네이크 케이스를 사용함
@@ -10,5 +11,5 @@ fn main() {
 // 대부분의 경우에는 return 키워드와 세미콜론이 제외된 반환값을 사용한다.
 
 fn calculate_weight_on_mars(weight: f32) -> f32 {
-    50.0
+    (weight / 9.81) * 3.711
 }
