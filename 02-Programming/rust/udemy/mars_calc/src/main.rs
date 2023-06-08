@@ -1,8 +1,14 @@
 // main 함수는 항상 러스트 파일이 실행될 때 제일 먼저 실행되는 코드
 fn main() {
+    let mut mars_weight = calculate_weight_on_mars(100.0);
+    // 변수를 재지정하면 
+    // cannot assign twice to immutable variable 에러가 발생함
+    // 러스트 변수는 기본적으로 불변 변수라는 것을 알 수 있다.
+    // 가변 변수로 만들려면 명시적으로 선언해줘야한다.
+    mars_weight = mars_weight * 1000.0;
     // println! 는 매크로, !가 붙어있으면 매크로라는 의미
     // cargo expand로 확인 가능
-    println!("Weight on Mars: {}kg", calculate_weight_on_mars(100.0));
+    println!("Weight on Mars: {}g", mars_weight);
 }
 
 // 러스트 코드는 함수와 변수명을 작성할 때 스네이크 케이스를 사용함
