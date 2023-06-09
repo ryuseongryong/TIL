@@ -1,5 +1,8 @@
 // main 함수는 항상 러스트 파일이 실행될 때 제일 먼저 실행되는 코드
+use std::io;
 fn main() {
+    let mut input = String::new();
+    io::stdin().read_line(&mut input);
     let mut mars_weight = calculate_weight_on_mars(100.0);
     // 변수를 재지정하면 
     // cannot assign twice to immutable variable 에러가 발생함
@@ -19,3 +22,11 @@ fn main() {
 fn calculate_weight_on_mars(weight: f32) -> f32 {
     (weight / 9.81) * 3.711
 }
+
+// 러스트에도 표준 라이브러리가 있음
+// 유용한 추상적 개념들의 집합을 뜻하는 것으로, 해시맵, 벡터, 데이터 구조 등과
+// 가장 중요한 입출력 기본 요소가 있다.
+// 표준 라이브러리는 외부 크레이트이다. 러스트에서 패키지를 가리키는 말이다.
+// 이 크레이트는 기본적으로 모든 러스트 프로젝트에서 사용 가능하다.
+// https://doc.rust-lang.org/stable/std 여기서 목록들을 찾을 수 있다.
+// https://doc.rust-lang.org/stable/std/io/index.html I/O 관련 내용
