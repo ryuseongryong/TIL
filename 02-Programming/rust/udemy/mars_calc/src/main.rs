@@ -84,16 +84,84 @@ fn main() {
         // 그 문자열 출력을 테스트해 볼 수 있는데, input값을 출력하여 여기에 입력되는 문자열을 전달한다.
         // 즉 read_line 함수는 문자열을 불변 차용하지만, 콘솔 입력으로 값을 변경해서 사용할 수 있다.
     io::stdin().read_line(&mut input);
-    println!("Input: {}", input);
-    let mut mars_weight = calculate_weight_on_mars(100.0);
-    // 변수를 재지정하면 
-    // cannot assign twice to immutable variable 에러가 발생함
-    // 러스트 변수는 기본적으로 불변 변수라는 것을 알 수 있다.
-    // 가변 변수로 만들려면 명시적으로 선언해줘야한다.
-    mars_weight = mars_weight * 1000.0;
-    // println! 는 매크로, !가 붙어있으면 매크로라는 의미
-    // cargo expand로 확인 가능
-    println!("Weight on Mars: {}g", mars_weight);
+
+    // 문자열 차용 출력
+    borrow_string(&input);
+    // 문자열 소유권
+    own_string(input)
+
+    // debugging
+    // ```
+    //  ❯ lldb ./mars_calc
+    //  (lldb) target create "./mars_calc"
+    //  Current executable set to '/Users/seongryongryu/TIL/02-Programming/rust/udemy/mars_calc/target/debug/mars_calc' (arm64).
+    //  (lldb) b borrow_string
+    //  Breakpoint 1: where = mars_calc`mars_calc::borrow_string::h508deaa1e5db8a55 + 24 at main.rs:107:5, address = 0x0000000100004040
+    //  (lldb) b own_string
+    //  Breakpoint 2: where = mars_calc`mars_calc::own_string::hd5423298876826e1 + 16 at main.rs:110:5, address = 0x0000000100004098
+    //  (lldb) b main.rs:89
+    //  Breakpoint 3: where = mars_calc`mars_calc::main::h7897582a59332745 + 116 at main.rs:89:5, address = 0x0000000100003fd8
+    //  (lldb) r
+    //  Process 69239 launched: '/Users/seongryongryu/TIL/02-Programming/rust/udemy/mars_calc/target/debug/mars_calc' (arm64)
+    //  12345
+    //  Process 69239 stopped
+    //  * thread #1, name = 'main', queue = 'com.apple.main-thread', stop reason = breakpoint 3.1
+    //      frame #0: 0x0000000100003fd8 mars_calc`mars_calc::main::h7897582a59332745 at main.rs:89:5
+    //     86  	    io::stdin().read_line(&mut input);
+    //     87
+    //     88  	    // 문자열 차용 출력
+    //  -> 89  	    borrow_string(&input);
+    //     90  	    // 문자열 소유권
+    //     91  	    own_string(input)
+    //     92
+    //  Target 0: (mars_calc) stopped.
+    //  (lldb) info locals
+    //  error: 'info' is not a valid command.
+    //  (lldb) fr v
+        //  locals에서 지역변수 input이 있는데, 상당히 복잡한 구조로 표현되어 있다.
+    //  (alloc::string::String) input = {
+    //    vec = {
+    //      buf = {
+    //        ptr = {
+        //  포인터가 있는데 힙을 가리키는 포인터이고, 이 주소는 문자열의 실제 바이트가 저장된 주소이다.
+        //  입력한 값 12345와 줄바꿈 태그를 볼 수 있다.
+        // 이 주소에는 스택에 표현되는 문자열을 저장하고 있다.
+    //          pointer = (pointer = "12345\n")
+    //          _marker = {}
+    //        }
+    //        cap = 8
+    //        alloc = {}
+    //      }
+        //  Stack에 바로 문자열의 길이를 저장한다. 
+        //  문자열의 길이를 요청하면 바로 대답할 수 있어 힙에 접근할 일이 없다.
+    //      len = 6
+    //    }
+    //  }
+    // ```
+
+    // ```
+        //(lldb) frame info
+        // frame #0: 0x0000000100003fd8 mars_calc`mars_calc::main::h7897582a59332745 at main.rs:89:5
+        // ckawhsms 
+    // ```
+
+    // println!("Input: {}", input);
+    // let mut mars_weight = calculate_weight_on_mars(100.0);
+    // // 변수를 재지정하면 
+    // // cannot assign twice to immutable variable 에러가 발생함
+    // // 러스트 변수는 기본적으로 불변 변수라는 것을 알 수 있다.
+    // // 가변 변수로 만들려면 명시적으로 선언해줘야한다.
+    // mars_weight = mars_weight * 1000.0;
+    // // println! 는 매크로, !가 붙어있으면 매크로라는 의미
+    // // cargo expand로 확인 가능
+    // println!("Weight on Mars: {}g", mars_weight);
+}
+
+fn borrow_string(s: &String) {
+    println!("{}", s);
+}
+fn own_string(s: String) {
+    println!("{}", s);
 }
 
 // 러스트 코드는 함수와 변수명을 작성할 때 스네이크 케이스를 사용함
@@ -135,3 +203,6 @@ fn calculate_weight_on_mars(weight: f32) -> f32 {
 // 이 크레이트는 기본적으로 모든 러스트 프로젝트에서 사용 가능하다.
 // https://doc.rust-lang.org/stable/std 여기서 목록들을 찾을 수 있다.
 // https://doc.rust-lang.org/stable/std/io/index.html I/O 관련 내용
+
+
+// ownership과 borrow이 런타임시에 어떻게 작동하는지에 대해서
