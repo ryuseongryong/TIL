@@ -10,7 +10,8 @@
             "name": "Debug",
             "program": "${workspaceFolder}/udemy/mars_calc/target/debug/mars_calc",
             "args": [],
-            "cwd": "${workspaceFolder}"
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": true
         }
     ]
 }
