@@ -140,10 +140,15 @@ fn main() {
     // ```
 
     // ```
-        //(lldb) frame info
-        // frame #0: 0x0000000100003fd8 mars_calc`mars_calc::main::h7897582a59332745 at main.rs:89:5
-        // ckawhsms 
+    // info args
+    // s = 0x7fffffffd908
     // ```
+        // s는 문자열을 차용하는 포인터일 뿐
+        // 참조는 단지 포인터일 뿐이고 대단한 것은 없다.
+        // 런타임시에 참조에 대한 규칙들을 전혀 알지 못하고 이 모든 기능들은 컴파일러가
+        // 컴파일 시에 강제로 사용하도록 한 것들이다.
+        // 하지만 런타임에 이런 것들에 상응하는 어떤 작업도 실행하지 않는다.
+        // 만약 실제로 이 포인터를 역참조한다면, 원래 문자열을 가리키는 것을 볼 수 있다.
 
     // println!("Input: {}", input);
     // let mut mars_weight = calculate_weight_on_mars(100.0);
