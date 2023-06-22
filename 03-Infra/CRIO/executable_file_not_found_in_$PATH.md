@@ -22,5 +22,22 @@ readlink /var/lib/containers/storage/overlay: invalid argument"
 - 해결 방법은 `/var/lib/containers/storage` 디렉터리에서 모든 이미지를 삭제하고 재부팅하는 것이다. 이를 수행하는 단계는 다음과 같다.
 1. 문제가 있는 이미지가 있는 노드를 비움
 2. 노드에 SSH로 접속하여 크리오 및 kubelet 서비스를 비활성화하고 재부팅
+  ```
+   $ systemctl disable crio; systemctl disable kubelet; reboot
+  ```
 3. 노드에서 ssh를 다시 시작하고 노드에서 스토리지 오버레이 디렉터리를 삭제한 후, 크리오 및 kubelet 서비스를 활성화하고 시작, 루트 사용자로 실행
+  ```
+  $ rm -rf /var/lib/containers/storage/*
+  $ systemctl enable crio; systemctl enable kubelet
+  Created symlink /etc/systemd/system/multi-user.target.wants/crio.service → /usr/lib/systemd/system/crio.service.
+  Created symlink /etc/systemd/system/multi-user.target.wants/kubelet.service → /etc/systemd/system/kubelet.service.
+  $ systemctl start crio; systemctl start kubelet
+  ```
 4. 몇 분간 기다렸다가 컨테이너가 다시 실행 중인지 확인.
+  ```
+  $ watch crictl ps
+  ```
+
+## 근본적인 원인
+- 이 문제는 레지스트리에서 이미지를 가져오는 동안 노드의 전원이 정상적으로 꺼지지 않아 하나 이상의 이미지가 손상되어 발생할 수 있음
+- 즉 어떤 이유로 인해 crio storage에 저장되는 이미지가 손상된 것이 문제
