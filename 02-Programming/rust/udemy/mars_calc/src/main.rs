@@ -1,6 +1,7 @@
 // main 함수는 항상 러스트 파일이 실행될 때 제일 먼저 실행되는 코드
 use std::io;
 fn main() {
+    println!("Enter your weight (kg): ");
         // 새로운 문자열을 생성함, 문자열은 변수 input이 소유하게 됨
         // input은 문자열 String의 소유자
         // 컴파일 시점에 문자열의 크기를 알지 못하기 때문에 힙에 저장된다.
@@ -83,12 +84,14 @@ fn main() {
         // 콘솔에서 입력되는 값으로 채워질 것이고, 그 문자열로부터 소유권을 얻으면 계속 사용할 수 있을 것이다. 
         // 그 문자열 출력을 테스트해 볼 수 있는데, input값을 출력하여 여기에 입력되는 문자열을 전달한다.
         // 즉 read_line 함수는 문자열을 불변 차용하지만, 콘솔 입력으로 값을 변경해서 사용할 수 있다.
-    io::stdin().read_line(&mut input);
+    // unwrap은 표준입력으로부터 값을 읽는 것에 실패하면 오류를 반환함
+    io::stdin().read_line(&mut input).unwrap();
 
+    let weight: f32 = input.trim().parse().unwrap();
     // 문자열 차용 출력
-    borrow_string(&input);
+    // borrow_string(&input);
     // 문자열 소유권
-    own_string(input)
+    // own_string(input)
 
     // debugging
     // ```
@@ -165,8 +168,7 @@ fn main() {
     // 소유권을 전달한다는 것은 데이터를 한 장소에서 다른 곳으로 이동한다는 뜻이다.
     // done.
 
-    // println!("Input: {}", input);
-    // let mut mars_weight = calculate_weight_on_mars(100.0);
+    let mars_weight = calculate_weight_on_mars(weight);
     // // 변수를 재지정하면 
     // // cannot assign twice to immutable variable 에러가 발생함
     // // 러스트 변수는 기본적으로 불변 변수라는 것을 알 수 있다.
@@ -174,15 +176,15 @@ fn main() {
     // mars_weight = mars_weight * 1000.0;
     // // println! 는 매크로, !가 붙어있으면 매크로라는 의미
     // // cargo expand로 확인 가능
-    // println!("Weight on Mars: {}g", mars_weight);
+    println!("Weight on Mars: {}kg", mars_weight);
 }
 
-fn borrow_string(s: &String) {
-    println!("{}", s);
-}
-fn own_string(s: String) {
-    println!("{}", s);
-}
+// fn borrow_string(s: &String) {
+//     println!("{}", s);
+// }
+// fn own_string(s: String) {
+//     println!("{}", s);
+// }
 
 // 러스트 코드는 함수와 변수명을 작성할 때 스네이크 케이스를 사용함
 // 함수의 마지막 표현식에서 끝에 세미콜론을 넣지 않는다. 반환 값 앞에 키워드 return을 사용하지 않아도 반환됨
