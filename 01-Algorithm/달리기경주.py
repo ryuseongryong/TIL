@@ -13,6 +13,8 @@ def solution(players, callings):
 def solution2(players, callings):
     players_dict = {player: rank for rank, player in enumerate(players)}
     ranks_dict = {rank: player for rank, player in enumerate(players)}
+    print(players_dict)
+    print(ranks_dict)
 
     for call in callings:
         rank = players_dict[call]
