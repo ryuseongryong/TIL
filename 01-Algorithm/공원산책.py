@@ -18,4 +18,16 @@ def solution(park, routes):
                 xx += 1
                 if move == int(route[2]) - 1:
                     x = xx
+            elif route[0] == "W" and xx != 0 and park[yy][xx - 1] != "X":
+                xx -= 1
+                if move == int(route[2]) - 1:
+                    x = xx
+            elif route[0] == "S" and yy != len(park) - 1 and park[yy + 1][xx] != "X":
+                yy += 1
+                if move == int(route[2]) - 1:
+                    y = yy
+            elif route[0] == "N" and yy != 0 and park[yy - 1][xx] != "X":
+                yy -= 1
+                if move == int(route[2]) - 1:
+                    y = yy
     return [y, x]
