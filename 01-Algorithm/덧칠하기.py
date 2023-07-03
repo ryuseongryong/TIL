@@ -20,4 +20,18 @@ def solution(n, m, section):
     return answer
 
 
-solution(8, 4, [2, 3, 6])
+def solution2(n, m, section):
+    answer = 1
+    prev = section[0]
+    for sec in section:
+        print(sec, prev, sec - prev)
+        if sec - prev >= m:
+            prev = sec
+            answer += 1
+            print(sec, prev)
+
+    return answer
+
+
+# solution(8, 4, [2, 3, 6])
+solution2(8, 4, [2, 3, 6])
