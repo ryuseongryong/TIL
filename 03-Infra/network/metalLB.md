@@ -113,6 +113,24 @@ L2 모드가 ARP 통신을 기반으로 동작하는 것에서 오는 한계 때
     - 서비스를 인그레스 컨트롤러 뒤에 배치하는 방법도 있다. 인그레스 컨트롤러 자체는 MetalLB를 사용하여 트래픽을 수신할 수 있지만, BGP와 서비스 사이에 스테이트풀 레이어가 있으면 걱정 없이 서비스를 변경할 수 있다. 인그레스 컨트롤러 자체의 배포를 변경할 때만 주의하면 된다.(scale up을 위해 NGINX 파드 추가할 때)
     - 리셋 연결이 때때로 폭주할 수 있다는 것을 인지하고 있어야 한다. 가용성이 낮은 내부 서비스의 경우, 이는 그대로 허용될 수 있다.
 
+### FRR 모드
+- MetalLB는 FRR 컨테이너를 BGP 세션 처리를 위한 백엔드로 사용하는 FRR 모드를 구현한다. 이 모드는 BGP 세션을 BFD 세션과 페어링하고 IPV6 주소를 광고하는 등 네이티브 BGP 구현에서는 사용할 수 없는 기능을 제공한다.
+- FRR 모드는 네이티브 BGP 구현보다 덜 실전 테스트를 거쳤음에도 불구하고 현재 BFD 또는 IPV6가 필요한 사용자들이 사용하고 있으며, OpenShift와 함께 배포된 MetalLB 버전에서 유일하게 지원되는 방식이다. 장기적인 계획은 이 모드를 MetalLB에서 사용할 수 있는 유일한 BGP 구현으로 만드는 것이다.
+
+## BGP 구현
+
+### Advertisement configuration
+- network에서 advertisement란?
+    - 네트워크 업데이트 및 변경 사항을 브로드캐스트하는 라우터 특성
+    - 라우터는 구성된 프로토콜에 따라 경로, 노드 및 네트워크 주소와 같은 정보가 포함된 라우팅 테이블을 통해 네트워크 정보를 유지하는 지능형 네트워킹 장치이다. 라우팅 프로토콜을 사용하면 인접 라우터 정보를 수집할 수 있고, 이 정보는 네트워크를 통해 다른 모든 노드에 광고된다.
+    - 라우터는 다양한 프로토콜을 사용하여 노드, 라우터 이름, 인터페이스 이름, IP주소 및 네트워크 주소를 포함한 모든 네트워크 라우팅 테이블 정보를 수집하고 저장한다. 수집된 네트워크는 네트워크를 통해 광고되며, 각 노드는 이에 따라 라우팅 테이블을 업데이트할 수 있다.
+- 기본적으로 BGP 모드는 추가 BGP 특성 없이 구성된 피어에 할당된 각 IP를 광고한다.
+- 피어 라우터는 각 서비스 IP에 대해 하나의 /32 경로를 수신하며, BGP localpref는 0으로 설정되고 BGP 커뮤니티는 없다.
+- 하나 이상의 사용자 지정 광고를 나열하는 여러 개의 BGPAdvertisements를 사용하여 보다 정교한 광고를 구성할 수 있다.
+- localpref 및 커뮤니티를 지정하는 것 외에도 이를 사용하여 집계 경로를 광고할 수 있다. 집계 길이 광고 옵션을 사용하면 /32를 더 큰 접두사로 롤업 할 수 있다. 여러 광고 구성과 결합하여 나머지 BGP 네트워크와 상호 운용되는 정교한 광고를 만들 수 있다.
+- 예를 들어, 임대된 /24 공용 IP 공간이 있고 이를 MetalLB에 할당했다고 가정해본다. 기본적으로 MetalLB는 각 IP를 /32로 광고하지만, 전송 제공업체는 /24보다 더 구체적인 경로를 거부한다. 따라서 어떻게든 /24 transit 공급자에게 광고해야 하지만 내부적으로 Ip별 라우팅을 수행할 수 있는 기능이 있어야 한다.
+
+
 ## References
 - https://metallb.universe.tf/concepts/layer2/
 - https://en.wikipedia.org/wiki/Hop_(networking)
@@ -121,3 +139,4 @@ L2 모드가 ARP 통신을 기반으로 동작하는 것에서 오는 한계 때
 - https://ubuntu.com/kubernetes/docs/metallb#:~:text=MetalLB%20is%20a%20Kubernetes%2Daware,Resolution%20Protocol
 - https://www.youtube.com/watch?v=RnjKMYD8SKc
 - https://metallb.universe.tf/concepts/bgp/
+- https://metallb.universe.tf/configuration/_advanced_bgp_configuration/
