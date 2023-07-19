@@ -1,13 +1,4 @@
 fn main() {
-    // let string = String::from("127.0.0.1:8080");
-    // let string_slice = &string[10..];
-    // let string_borrow: &str = &string;
-    // let string_literal = "1234";
-
-    // dbg!(&string);
-    // dbg!(string_slice);
-    // dbg!(string_borrow);
-    // dbg!(string_literal);
     let server = Server::new("127.0.0.1:8080".to_string());
     server.run();
 }
@@ -27,3 +18,27 @@ impl Server {
         println!("Listening on {}", self.addr)
     }
 }
+
+struct Request {
+    path: String,
+    query_string: String,
+    method: Method,
+}
+
+enum Method {
+    GET,
+    DELETE,
+    POST, // = 5를 설정하여, variant 설정 가능, 이후로 1씩 증가된 값으로 설정됨,
+    PUT, // 이를 응답코드에서 사용할 수 있음 404 Not Found
+    HEAD,
+    CONNECT,
+    OPTIONS,
+    TRACE,
+    PATCH,
+}
+
+/*
+GET /user?id=10 HTTP/1.1\r\n
+HEADERS \r\n
+BODY
+ */
