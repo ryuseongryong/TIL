@@ -1,22 +1,25 @@
 fn main() {
-    let server = Server::new("127.0.0.1:8080".to_string());
+    let server = server::Server::new("127.0.0.1:8080".to_string());
     server.run();
 }
 
-struct Server {
-    addr: String,
-}
-
-impl Server {
-    fn new(addr: String) -> Self {
-        Self {
-            addr
+mod server {
+    pub struct Server {
+        addr: String,
+    }
+    
+    impl Server {
+        pub fn new(addr: String) -> Self {
+            Self {
+                addr
+            }
+        }
+    
+        pub fn run(self) {
+            println!("Listening on {}", self.addr)
         }
     }
 
-    fn run(self) {
-        println!("Listening on {}", self.addr)
-    }
 }
 
 struct Request {
