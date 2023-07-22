@@ -22,26 +22,26 @@ mod server {
 
 }
 
-struct Request {
-    path: String,
-    query_string: Option<String>,
-    method: Method,
+mod http {
+    mod request {
+        struct Request {
+            path: String,
+            query_string: Option<String>,
+            method: super::method::Method,
+        }
+    }
+    
+    mod method {
+        pub enum Method {
+            GET,
+            DELETE,
+            POST, // = 5를 설정하여, variant 설정 가능, 이후로 1씩 증가된 값으로 설정됨,
+            PUT, // 이를 응답코드에서 사용할 수 있음 404 Not Found
+            HEAD,
+            CONNECT,
+            OPTIONS,
+            TRACE,
+            PATCH,
+        }
+    }
 }
-
-enum Method {
-    GET,
-    DELETE,
-    POST, // = 5를 설정하여, variant 설정 가능, 이후로 1씩 증가된 값으로 설정됨,
-    PUT, // 이를 응답코드에서 사용할 수 있음 404 Not Found
-    HEAD,
-    CONNECT,
-    OPTIONS,
-    TRACE,
-    PATCH,
-}
-
-/*
-GET /user?id=10 HTTP/1.1\r\n
-HEADERS \r\n
-BODY
- */
