@@ -16,11 +16,9 @@ impl Server {
 
         let listener = TcpListener::bind(&self.addr).unwrap();
 
-        'outer: loop {
-            loop {
-                // break 'outer;
-                // continue 'outer;
-            }
+        loop {
+            listener.accept();
         }
+        let tup = (5, "a", listener);
     }
 }
