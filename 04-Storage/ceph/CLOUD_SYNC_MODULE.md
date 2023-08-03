@@ -1,3 +1,4 @@
+# Cloud Sync Module
 - https://docs.ceph.com/en/latest/radosgw/cloud-sync-module/
 
 - 이 모듈은 영역 데이터를 원격 클라우드 서비스에 동기화한다.
