@@ -1,0 +1,1 @@
+- https://www.elastic.co/kr/licensing/elastic-license/faq
