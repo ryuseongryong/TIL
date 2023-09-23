@@ -81,3 +81,24 @@ CSRF(교차 사이트 요청 위조)는 악성 웹사이트, 이메일, 블로�
     - JWT가 생성될 때마다 변경되는 JWT 내의 임의 값(예: UUID)
 - 순진한 구현의 임의 값과 혼동하지 말아야 하는 비밀 암호화 키입니다. 이 값은 HMAC 해시를 생성하는 데 사용됩니다. 이 키를 환경 변수로 저장하는 것이 가장 이상적입니다.
 - 충돌 방지를 위한 임의의 값입니다. 같은 초 내에 연속적으로 호출할 때 동일한 해시(1)가 생성되지 않도록 임의의 값(가급적 암호학적으로 무작위)을 생성합니다.
+
+- 다음은 위에서 설명한 구현 단계를 보여주는 의사 코드의 예시입니다:
+    ```
+    // Gather the values
+    secret = readEnvironmentVariable("CSRF_SECRET") // HMAC secret key
+    sessionID = session.sessionID // Current authenticated user session
+    randomValue = cryptographic.randomValue() // Cryptographic random value
+
+    // Create the CSRF Token
+    message = sessionID + "!" + randomValue // HMAC message payload
+    hmac = hmac("SHA256", secret, message) // Generate the HMAC hash
+    csrfToken = hmac + "." + message // Combine HMAC hash with message to generate the token. The plain message is required to later authenticate it against its HMAC hash
+
+    // Store the CSRF Token in a cookie
+    response.setCookie("csrf_token=" + csrfToken + "; Secure) // Set Cookie without HttpOnly flag
+
+    ```
+
+- 만료를 위해 CSRF 토큰에 타임스탬프를 포함해야 하나요?
+    - CSRF 토큰 만료 시간을 지정하는 값으로 타임스탬프를 포함시키는 것은 일반적인 오해입니다. CSRF 토큰은 액세스 토큰이 아닙니다. 세션 정보를 사용하여 세션 전체에서 요청의 진위 여부를 확인하는 데 사용됩니다. 새 세션은 새 토큰을 생성해야 합니다(1).
+
