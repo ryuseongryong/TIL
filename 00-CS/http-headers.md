@@ -18,3 +18,7 @@ HTTP 헤더는 요청 및 응답 헤더를 통해 클라이언트와 서버 간�
 - Trailer
 - Transfer-Encoding
 - Authentication 
+    - Authorization : 제한된 문서를 요청하는 데 사용됩니다.
+    - Proxy-Autenticate : 인증 방법을 정의하여 리소스 파일에 대한 액세스 권한을 부여하는 응답 헤더입니다. 프록시 서버가 요청을 인증하여 추가 전송할 수 있도록 합니다.
+    - Proxy-Authorization : 유형의 헤더입니다. 이 헤더에는 사용자 에이전트와 사용자가 지정한 서버 간에 인증하기 위한 자격 증명이 포함됩니다.
+    - WWW-Authenticate : 인증 방법을 정의하는 응답 헤더입니다. 리소스에 대한 액세스 권한을 얻는 데 사용해야 합니다.
