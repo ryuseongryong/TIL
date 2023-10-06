@@ -62,3 +62,14 @@ HTTP 헤더는 요청 및 응답 헤더를 통해 클라이언트와 서버 간�
     - Set-Cookie : 응답 헤더이며 서버에서 사용자 에이전트로 쿠키를 보내는 데 사용됩니다. 사용자 에이전트는 나중에 서버로 쿠키를 다시 전송하여 서버가 사용자를 감지할 수 있도록 합니다.
     - Cookie2 : 요청 유형 헤더입니다. 사용자가 서버로 보내는 요청에 사용되는 쿠키2입니다.
     - Set-Cookie2 : 응답 유형 헤더이며 더 이상 사용되지 않습니다. 클라이언트에서 서버로 상태 정보를 제공하고 검색하는 메커니즘을 제공하는 공급자입니다.
+- CORS
+    - Access-Control-Allow-Origin : 지정된 오리진의 요청 코드와 응답을 공유할 수 있는지 여부를 나타내는 데 사용되는 응답 헤더입니다.
+    - Access-Control-Allow-Credentials : 응답 헤더입니다. Access-Control-Allow-Credentials 헤더는 요청의 자격 증명 모드 요청.credentials가 "include"일 때 브라우저에 프런트엔드 JavaScript 코드에 응답을 노출하도록 지시하는 데 사용됩니다.
+    - Access-Control-Allow-Headers : 응답 헤더에 언급된 헤더를 노출하는 데 사용되는 응답 헤더입니다. 기본적으로 6개의 응답 헤더가 이미 노출되며, 이를 CORS 허용 목록 응답 헤더라고 합니다.
+    - Access-Control-Allow-Methods : 리소스에 액세스할 때 허용되는 메소드를 지정하는 응답 유형 헤더입니다.
+    - Access-Control-Expose-Headers : 노출할 수 있는 헤더를 나타내는 응답형 헤더입니다.
+    - Access-Control-Max-Age : 특정 방법과 헤더를 사용하여 CORS 프로토콜이 이해되고 서버가 인지하고 있는지 확인하는 CORS 프리플라이트 요청의 결과를 캐시할 수 있는 시간을 알려주는 응답 헤더입니다.
+    - Access-Control-Request-Headers : 요청 유형 헤더로, 실제 요청이 이루어질 때 어떤 HTTP 헤더가 사용될지 서버에 알려줍니다.
+    - Access-Control-Request-Method : 요청 유형 헤더로, 실제 요청이 이루어질 때 어떤 HTTP 메서드가 사용될지 서버에 알려줍니다.
+    - Origin : 경로 정보를 표시하지 않고 HTTP 요청을 시작하는 보안 컨텍스트를 나타내는 응답 HTTP 헤더입니다.
+    - Timing-Allow-Origin : 응답 유형 헤더입니다. 리소스 타이밍 API의 기능을 통해 검색된 속성 값을 볼 수 있는 원본을 지정합니다.
