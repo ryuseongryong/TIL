@@ -27,3 +27,42 @@
     
 # 실습환경 구축
 - mysql community server download
+
+---
+
+# 데이터베이스 맛보기
+- show databases;
+- world database, sakila database 추가
+    - download, source ~/filepath로 추가
+- use world;
+- show tables;
+- desc country;
+- select name, population from country where continent = 'Asia';
+- select name, population from country where name = 'South Korea';
+
+# 데이터베이스 시스템의 개념
+- sql이라는 언어를 통해서 데이터베이스를 이용
+- 데이터베이스 시스템은 DBMS <-> Database[File0, File1, File2] 구조
+    - DBMS : 관리 SW
+    - 데이터베이스 : 데이터의 집합체
+    - 데이터의 저장 단위인 파일 = Table
+- 데이터베이스 : 데이터를 한 곳에 체계적으로 모아 놓은 데이터 저장소 = 데이터 뱅크
+    - 데이터베이스는 보통 물리 저장장치인 하드디스크에 구현함
+    - 특정 폴더 아래 테이블을 파일 형태로 저장하는 형태가 있고,
+    - 하나의 커다란 파일 안에 테이블을 저장하는 형태가 있다.
+    - e.g. mysql : world database[city, country, country language, ...(tables)]
+    - 데이터베이스에는 데이터와 데이터베이스를 관리하기 위한 정보(메타정보)도 함께 저장됨 : 사용자가 필요로 하는 테이블 + 시스템이 사용하는 테이블
+        - 데이터베이스를 관리하는 정보를 시스템 카탈로그, 데이터 사전이라고 부르기도 함. : 사용자 계정정보, 권한정보, 테이블 목록 및 구조, 저장공간 정보, 사용 로그 등
+        => 데이터에 대한 데이터 = 메타데이터
+- DBMS : 데이터베이스를 관리하는 소프트웨어
+    - e.g. mysqld.exe의 형태라고 window에서는 볼 수 있음
+    - 백그라운드 프로세스로 상시 실행 가능
+    - 데이터베이스의 성능 = DBMS의 성능
+    - 기능
+        - 데이터 정의 기능 : 사용자가 데이터베이스를 생성하거나
+        데이터베이스 내 원하는 구조의 파일(테이블)을 생성/변경할 수 있도록 지원
+        - 데이터 조작 기능 : 사용자가 데이터베이스 내의 파일(테이블)에 대해 조회하거나 데이터를 삽입, 수정, 변경, 삭제하는 기능을 지원
+        - 데이터 제어 기능 : 다수의 사용자가 이요하는 데이터베이스 내의 데이터를 정확하고 안전하게 유지하는 기능 - 보안관리(접근제어), 병행수행 제어, 데이터베이스의 백업 및 복구
+- 데이터베이스 : 데이터의 집합체
+
+
