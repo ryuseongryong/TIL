@@ -65,4 +65,22 @@
         - 데이터 제어 기능 : 다수의 사용자가 이요하는 데이터베이스 내의 데이터를 정확하고 안전하게 유지하는 기능 - 보안관리(접근제어), 병행수행 제어, 데이터베이스의 백업 및 복구
 - 데이터베이스 : 데이터의 집합체
 
-
+# 데이터베이스 사용자, 언어
+- 최종 사용자(end user), 개발자, 관리자(DBA)
+    - 최종 사용자(end user) : 이미 구축된 데이터베이스를 이용하는데 주된 관심
+        - 캐주얼 사용자 : SQL을 이용하여 매번 다른 정보를 검색, 개발자, 기업 내부 사용자
+        - 초보 사용자 : 이미 구축된 데이터베이스를 이용하는데 주된 관심, 데이터베이스의 존재를 알지 못하고 사용, REST API를 통해 구축된 시스템을 이용해 간접적으로 데이터베이스를 사용하는 의미인듯(e.g. 신용카드, 교통카드 이용, 인터넷 우편번호 조회 등)
+    - 응용 프로그래머(Application Developer) : 데이터베이스를 이용하는 앱 개발자(초보 사용자가 사용하는 SW)
+        - 대규모 정보시스템, 동영상 플랫폼, 일정 관리 프로그램 등
+        - 개발언어 + SQL(ORM 이용) : 내장 SQL / 임베디드 SQL
+    - 데이터베이스 관리자(DBA) : 일반관리자 ~ 최고관리자(DBA)
+        - 데이터베이스 시스템의 운영, 관리에 대한  책임을 지고 있는 사용자
+        - 현장 업무와 기술적인 지식 필요
+        - SQL(Structured Query Language) : 관계형 데이터베이스 표준 언어
+            - DMBS와 커뮤니케이션 하기 위한 언어
+            - 한국의 인구와 GNP는 얼마인가? = SELECT name, population, GNP FROM country WHERE name='South Korea';
+            - 아시아에 속한 국가들의 이름과 인구수는? = SELECT name, population FROM country WHERE continent='Asia';
+            - 아시아에 속한 국가들의 GNP의 합계는? = SELECT SUM(GNP) FROM country WHERE continent='Asia';
+            - 한국인의 기대수명을 80으로 바꾸시오 = UPDATE country SET LifeExpectancy = 80 WHERE name='South Korea';
+            - New Stan이라는 신생국의 정보를 추가하시오 = INSERT INTO country (code, name, continent) values ('NST', 'New Stan', 'Asia');
+            - NEW Stan에 대한 자료를 삭제하시오 = DELETE FROM country WHERE name='New Stan';
