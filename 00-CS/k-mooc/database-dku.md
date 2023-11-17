@@ -317,10 +317,70 @@
 
 # SELECT문 추가사항
 # 내장함수의 사용
-- SELECT deptno, sum(sal) AS 급여합계
-  FROM emp
-  WHERE sal >= 500
-  GROUP BY deptno
-  HAVING 급여합계 >= 2500
-  ORDER BY 급여합계 DESC;
-- LIMIT은 비표준 문법
+- WHERE절에서 문자 컬럼의 부분 비교
+    - LIKE : 문자 속성의 컬럼에 대해 지정한 문자열을 포함하는지 비교
+    - % : LIKE와 함께 사용되며 임의의 개수인 문자를 표현
+    - _ : LIKE와 함꼐 사용되며 하나의 문자를 표현
+- WHERE절에서 값의 범위 지정
+    - BETWEEN AND : 포함되는 값( >= AND <=)
+    - NOT BETWEEN AND : 제외되는 값 (< OR >)
+- WHERE절에서 비교할 값들의 집합을 지정
+    - IN : 어느 하나라도 매칭이 되면 선택 (= OR = OR =)
+    - NOT IN : 조건 값이 아닌 나머지 (<> AND <> AND <>)
+
+# 정렬과 그룹
+- 정렬 : 결과를 주어진 기준에 따라 튜플을 정렬하여 보여주는 기능
+    - 담당업무가 SALESMAN인 사원에 대해 입사일자가 빠른 순으로 사원의 이름, 입사일자를 보이시오.
+        - SELECT ename, hiredate 
+        - FROM emp 
+        - WHERE job = 'SALESMAN' 
+        - ORDER BY hiredate ; -> 정렬을 위한 키워드
+    - 정렬 기준
+        - 오름차순(기본) : A - Z, ㄱ - ㅎ, 1 - 100
+        - 내림차순 : Z - A, ㅎ - ㄱ, 100 - 1
+    - 담당업무가 SALESMAN인 사원에 대해 연봉이 많은 순으로 사원의 이름과 연봉을 보이시오.
+        - SELECT ename, sal
+        - FROM emp
+        - WHERE job = 'SALESMAN'
+        - ORDER BY sal DESC ; -> 내림차순 정렬
+    - 모든 사원의 부서번호, 이름, 담당업무를 보이되 8부서번호 순으로 정렬하여 보이시오. 같은 부서안에서는 이름 알파벳 순으로 정렬하시오.
+        - SELECT deptno, ename, job
+        - FROM emp
+        - ORDER BY deptno, ename -> 두 기준으로 정렬
+    - SQL 정렬 기준은 여러 개 지정 가능
+- 그룹(GROUP) : 테이블에 대해서 어떤 질의를 했을 때 그 결과를 그룹으로 묶어서 봄
+    - 각 부서번호별 사원의 수를 구하시오
+        - SELECT deptno, COUNT(*) AS 사원수
+        - FROM emp
+        - GROUP BY deptno ; -> 그룹핑 후, COUNT(*) 튜플의 개수를 센다.
+    - 각 부서번호별 평균 연봉을 구하시오
+        - SELECT deptno, AVG(sal) AS 평균연봉
+        - FROM emp
+        - GROUP BY deptno ; -> deptno으로 그룹핑된 튜플의 평균값(sal)을 산출함
+    - GROUP BY를 사용 시 SELECT 다음에 올 수 있는 컬럼들
+        - GROUP BY에 사용한 컬럼
+        - COUNT(), MAX(), MIN() 집계함수를 적용한 컬럼
+        - 기타 컬럼은 에러가 나지는 않지만, 의미 없는 값이 온다.
+- HAVING : GROUP BY를 적용한 결과에서 추가로 적용할 때 사용
+    - 각 부서번호별 사원의 수를 구하시오. 단, 사원의 수가 5명 이상인 부서만 보이시오.
+        - SELECT deptno, COUNT(*) AS 사원수
+        - FROM emp
+        - GROUP BY deptno
+        - HAVING COUNT(*) >= 5 ;
+    => 튜플에 대한 조건 = WHERE
+    => GROUPING 결과에 대한 조건 = HAVING
+- 각 부서번호별 사원의 수를 구하시오. 단, 사원의 수가 5명 이상인 부서만 보이되, 사원수가 많은 순으로 보이시오.
+    - SELECT deptno, COUNT(*) AS 사원수
+    - FROM emp
+    - GROUP BY deptno -> 그룹핑
+    - HAVING 사원수 >= 5 -> 조건지정
+    - ORDER BY 사원수 DESC ; -> 정렬
+- 각 부서번호별 급여합계를 구하시오. 단, 급여합계가 2500이상인 부서만 보이되 급여합계가 많은 순으로 하고 급여가 500 미만인 사원은 대상에서 제외하시오.
+    - SELECT deptno, SUM(sal) AS 급여합계
+    - FROM emp
+    - WHERE sal >= 500
+    - GROUP BY deptno
+    - HAVING 급여합계 >= 2500
+    - ORDER BY 급여합계 DESC ;
+
+- LIMIT : 출력되는 데이터 제한 가능(비표준 문법이라 DBMS마다 조금씩 다를 수 있음)
