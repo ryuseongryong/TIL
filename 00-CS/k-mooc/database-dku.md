@@ -406,3 +406,33 @@
     - 외래키는 항상 부모테이블의 기본키를 참조함
 - 일반적으로 기본키와 외래키는 테이블이 생성될 때 설정됨
 - 외래키에는 null값이 허용됨
+
+# 조인 연산
+- 두 개 이상의 테이블을 연결하여 조회하는 작업
+- 모든 사원의 이름과 부서명, 근무지를 보이시오
+    - SELECT emp.ename, dept.dname, dept.loc
+    - FROM emp, dept -> 카티션프로덕트 적용
+    - WHERE emp.deptno = dept.deptno ;
+- 조인 연산 유의점
+    - 조인 조건의 서술이 필수적임
+    - 컬럼 이름 앞에 테이블 이름을 붙임
+    - 두 테이블을 조인하기 위해 반드시 두 테이블이 참조관계에 있을 필요는 없음(필수는 아니지만 참조무결성을 위해서 필요함)
+    - 외래키로 연결하지 않으면? DBMS가 참조 무결성을 지키지 못함
+    - 컬럼의 이름이 명화하면 테이블 명을 생략해도 됨
+    - 테이블의 별칭을 지정할 수 있음
+        - SELECT ename, dname, loc
+        - FROM emp e, dept d
+        - WHERE e.deptno = d.deptno ;
+- 조인 연산 종류
+    - Inner join : 두 테이블의 일치되는 튜플만 표시(일반적 조인)
+    - Left join : 왼쪽 테이블의 튜플은 모두 표시되고, 여기에 대응하는 오른쪽 테이블의 튜플 연결 / 오른쪽 튜플에서 연결할 튜플이 없으면 NULL로 표시
+    - Right join : 오른쪽 테이블의 튜플은 모두 표시되고, 여기에 대응하는 왼쪽 테이블의 튜플 연결 / 왼쪽 튜플에서 연결할 튜플이 없으면 NULL로 표시
+    - Outer join : 왼쪽, 오른쪽 튜플을 모두 표시 / 연결할 튜플이 없는 경우 NULL로 표시
+- 셀프 조인(Self join)
+    - 모든 사원의 이름과 사원의 매니저 이름을 보이시오
+        - SELECT e.ename AS employee, m.ename AS manager
+        - FROM emp e, emp m
+        - WHERE e.mgr = m.empno ;
+        - 같은 emp에 대해 e와 m으로 별칭을 설정하여 조건에서 사용함
+        - 최상위에 있는 컬럼도 나오게 하기 위해서는 LEFT JOIN을 사용하면 됨
+            - SELECT e.ename AS employee, m.ename AS manager FROM emp e LEFT JOIN emp m ON e.mgr = m.empno ;
