@@ -436,3 +436,38 @@
         - 같은 emp에 대해 e와 m으로 별칭을 설정하여 조건에서 사용함
         - 최상위에 있는 컬럼도 나오게 하기 위해서는 LEFT JOIN을 사용하면 됨
             - SELECT e.ename AS employee, m.ename AS manager FROM emp e LEFT JOIN emp m ON e.mgr = m.empno ;
+
+# UNION, INTERSECT, MINUS
+- 집합연산 상당 부분을 구현하는 SQL
+- 합집합 : UNION
+- 교집합 : INTERSECT
+- 차집합 : MINUS
+- 관계 대수에서 집합 연산이 가능하려면 구조가 같아야 함
+    - 두 컬럼의 개수가 같아야 함
+    - 대응하는 컬럼의 도메인(자료형)이 같아야 함
+- 급여를 2500 이상 받거나 담당업무가 MANAGER인 사원의 이름과 입사일자를 보이시오
+    - SELECT ename, hiredate
+    - FROM emp
+    - WHERE sal >= 2500
+    - UNION (ALL -> 중복된 것도 포함)
+    - SELECT ename, hiredate
+    - FROM emp
+    - WHERE job = 'MANAGER' ;
+    => UNION만 사용되었을 때, WHERE sal >= 2500 OR job = 'MANGER' 조건을 사용하여 동일한 결과를 얻을 수 있음
+- 급여를 2500 이상 받고 담당업무가 MANAGER인 사원의 이름과 입사일자를 보이시오
+    - SELECT ename, hiredate
+    - FROM emp
+    - WHERE sal >= 2500
+    - INTERSECT => AND 조건을 활용하면 동일한 결과를 얻을 수 있음
+    - SELECT ename, hiredate
+    - FROM emp
+    - WHERE job = 'MANAGER' ;
+
+- 급여를 2500 이상 받는 사원 중 담당업무가 'MANAGER'인 사원을 제외하여 이름과 입사일자를 보이시오
+    - SELECT ename, hiredate
+    - FROM emp
+    - WHERE sal >= 2500
+    - MINUS => AND <>(NOT) 조건으로 동일한 결과를 얻을 수 있음
+    - SELECT ename, hiredate
+    - FROM emp
+    - WHERE job = 'MANAGER' ;
