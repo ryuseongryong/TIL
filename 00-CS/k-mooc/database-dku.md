@@ -471,3 +471,59 @@
     - SELECT ename, hiredate
     - FROM emp
     - WHERE job = 'MANAGER' ;
+
+# 중첩 SQL
+- SQL문 안에 또 다른 SQL문이 포함된 SQL
+- 중첩 SQL은 언제 사용하면 좋을까?
+    - WHERE 조건을 잘 써주면 해결되는 경우가 있음
+    - 반드시 중첩 SQL을 써야만 해결되는 질의가 있음 -> 좋은 개발자의 조건
+- 예시
+    - SELECT ename, hiredate
+    - FROM emp
+    - WHERE sal >= (SELCET MIN(sal)
+                    FROM emp             
+                    WHERE job = 'ANALYST' ); => 서브쿼리
+- 단일 값 서브쿼리 : 중첩 SQL에서 하나의 값을 도출함
+- 다중 값 서브쿼리 : 중첩 SQL에서 여러 개의 값을 도출함
+- 가장 많은 급여를 받는 사원의 이름, 담당업무, 급여액을 보이시오
+    - SELECT ename, job, sal
+    - FROM emp
+    - WHERE sal = ( SELECT MAX(sal)
+                    FROM emp ) ;
+- 중첩 SQL의 이점
+    - SQL이 간단해짐
+    - 실행속도가 빨라짐
+    - 중첩 SQL이 항상 빠른 것은 아님
+- 중첩 SQL의 결과는 단일 값이 왔을 때 비교연산자를 사용할 수 있음
+- 사원들 중 평균 이상의 연봉을 받는 사원들의 이름, 담당업무, 급여액을 보이시오
+    - SELECT ename, job, sal
+    - FROM emp
+    - WHERE sal >= ( SELECT AVG(sal)
+                     FROM emp ) ;
+- 1981년도에 입사한 사원들 중 평균 이상의 연봉을 받는 사원들의 이름, 담당업무, 급여액, 입사일자를 보이시오
+    - SELECT ename, job, sal, hiredate
+    - FROM emp
+    - WHERE sal >= ( SELECT AVG(sal)
+                     FROM emp )
+    - AND hiredate BETWEEN '1981-01-01' AND '1981-12-31' ;
+- 부서이름 'S'를 포함하는 부서에 근무하는 사원들의 이름, 담당업무, 부서번호를 보이시오.
+    - SELECT ename, job, deptno
+    - FROM emp
+    - WHERE deptno IN ( SELECT deptno
+                        FROM dept
+                        WHERE dname LIKE '%S%' ) ;
+- 'SMITH', 'ALLEN' 사원과 다른 업무를 하는 사원들의 이름과 담당업무, 급여액을 보이시오.
+    - SELECT ename, job, sal
+    - FROM emp
+    - WHERE job NOT IN ( SELECT job 
+                         FROM emp
+                         WHERE ename = 'SMITH' OR
+                               ename = 'ALLEN' ) ;
+- 다중 값 서브쿼리의 경우 IN을 사용
+- 중첩 SQL은 간편성, 신속성을 위해 사용이 필요하다.
+- Summary
+    - SORT를 통해 질의 결과를 주어진 기준에 따라 정렬할 수 있고, GROUP BY를 통해 질의 결과를 그룹별로 집계하여 볼 수 있다.
+    - 기본키는 DBMS가 튜플의 중복성을 확인하는 데 사용되고, 외래키는 참조무결성을 확인하는 데 사용된다.
+    - 두 개 이상의 테이블을 공통속성을 통해 연결하여 하나의 테이블을 도출하는 것을 조인연산이라고 한다.
+    - SQL은 관계 대수의 일부 집합 연산을 제공하고 있으나 널리 사용되지는 않는다.
+    - 중첩 SQL은 SQL문 안에 또 다른 SQL문이 포함된 형태를 말한다.
