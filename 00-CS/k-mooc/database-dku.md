@@ -527,3 +527,74 @@
     - 두 개 이상의 테이블을 공통속성을 통해 연결하여 하나의 테이블을 도출하는 것을 조인연산이라고 한다.
     - SQL은 관계 대수의 일부 집합 연산을 제공하고 있으나 널리 사용되지는 않는다.
     - 중첩 SQL은 SQL문 안에 또 다른 SQL문이 포함된 형태를 말한다.
+
+# 데이터 정의어
+- CREATE
+    - 테이블을 포함해서 데이터베이스 안에 저장되는 모든 객체구조(스키마)를 정의함
+    - 데이터베이스 자체도 CREATE문을 이용하여 생성함
+    - CREATE(DATABASE)
+        - CREATE DATABASE 데이터베이스이름 ;
+    - CREATE(TABLE)
+        - 외래키가 있는 경우, 해당 키를 참조하는 테이블을 먼저 생성해야 함
+        - CREATE TABLE 테이블명 (
+            컬럼명 자료형 [NOT NULL],
+            컬럼명 자료형 [NOT NULL],
+            ...,
+            [CONSTRAINT 제약조건명 PRIMARY KEY (컬럼목록)],
+            [CONSTRAINT 제약조건명 FOREIGN KEY (컬럼목록)
+                                REFERENCES 테이블명(컬럼목록)],
+                [ON UPDATE 처리방법] --> 외래키 관련 내용들
+                [ON DELETE 처리방법]
+        ) ;
+        - 컬럼의 자료형(data type)은 DBMS 제품마다 명칭이 다름
+            - CHAR : 고정 길이 문자 저장에 사용(성별, 주민번호, 국가코드), 값이 없으면 공백 저장
+            - VARCHAR : 가변길이 문자 저장에 사용(주소, 건물명, 취미), 값이 없으면 저장공간 사용 안함
+        - 초기값의 지정
+            - gender char(1) DEFAULT 'M'
+        - 컬럼에 대한 추가 지정사항
+            - 컬럼 값의 중복 불가 지정(대체키)
+                - cell_phone char(11) UNIQUE, --> 중복성 체크
+        - 제약 조건의 지정
+            - 기본키 지정 : CONSTRAINT pk_deptno PRIMARY KEY(deptno)
+            - 외래키 지정 : CONSTRAINT fk_deptno FOREIGN KEY (deptno) REFERENCES my_dept(deptno) ON UPDATE CASCADE ON DELETE RESTRICT
+            - ON UPDATE, ON DELETE 될 때 쓸 수 있는 제약 조건
+                - RESTRICT : 변경되는 부모 테이블의 기본키 값을 참조하는 자식 테이블의 튜플이 있으면 UPDATE문이 실행되는 것을 제한한다.
+                - CASCADE : 변경되는 부모 테이블의 기본키 값을 참조하는 자식 테이블의 튜플이 있으면 자식 테이블의 외래키 컬럼도 함께 변경한다.
+                - SET NULL : 변경되는 부모 테이블의 기본키 값을 참조하는 자식 테이블의 튜플이 있으면 자식 테이블의 외래키 컬럼의 값을 NULL로 변경한다.
+                - NO ACTION : 변경되는 부모 테이블의 기본키 값을 참조하는 자식 테이블의 튜플이 있어도 자식 테이블에 대해 아무일도 하지 않는다.(무결성이 깨짐)
+        - MySQL에서 테이블의 구조 확인 : DESC 테이블명 ;
+        - 질의 결과로부터 테이블 생성(질의 결과를 테이블로 저장) : CREATE TABLE emp_sal_high AS SELEcT * FROM my_db.emp WHERE sal >= 2000 ;
+            - 테이블 생성 + 데이터 입력
+- ALTER
+    - CREATE문으로 생성한 데이터베이스 객체들의 구조를 변경함
+    - 테이블에 새로운 컬럼 추가
+        - ALTER TABLE my_dept
+        - ADD COLUMN budget decimal(10,2) default 0 
+                        AFTER dname ; --> 추가 위치 지정도 가능
+    - 컬럼의 이름 변경 --> 저장된 데이터에는 영향이 없음
+        - ALERT TABLE my_dept
+        - CHANGE COLUMN budget dept_budget decimal(10,2) default 0 ;
+    - 컬럼의 지정내용 변경 --> 저장된 데이터가 손실될 수 있음
+        - ALTER TABLE my_dept
+        - MODIFY COLUMN dept_budget decimal(8,0) ;
+    - 컬럼의 삭제 --> 저장된 데이터 삭제
+        - ALTER TABLE my_dept
+        - DROP COLUMN dept_budget ;
+    - 기본키 외래키의 지정
+        - ALTER TABLE my_emp
+        - ADD CONSTRAINT pk_empno PRIMARY KEY(empno),
+        - ADD CONSTRAINT fk_deptno FOREIGN KEY (deptno) REFERENCES
+                                    my_dept(deptno)
+                ON UPDATE CASCADE ON DELETE RESTRICT ;
+    - 테이블 이름의 변경 --> 저장된 데이터 영향 없음
+        - ALTER TABLE emp_sal_high
+        - RENAME sal_high ;
+- DROP
+    - CREATE문으로 생성한 데이터베이스 객체들을 삭제함
+    - 생성된 테이블 삭제 = 테이블 구조와 저장된 데이터 모두 삭제됨
+- 데이터베이스 객체들
+    - 테이블
+    - 뷰
+    - 인덱스
+    - 함수
+    - 저장 프로시저
