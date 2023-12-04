@@ -732,6 +732,62 @@
         - <-- 실제 프로시저를 만드는 코드 --> 
         - CREATE PROCEDURE 프로시저 이름([입력변수 리스트]) 
         - BEGIN
-            처리내용
+            처리내용 --> 프로그램에서 처리해야하는 내용
         - END <-- 실제 프로시저를 만드는 코드 --> //
         - DELIMITER ;
+    
+    2. 프로시저의 정의 예제
+        - my_db의 emp 테이블에 대해 사원번호를 입력하면 해당 사원의 모든 정보를 화면에 표시함
+        - DELIMITER //
+        - CREATE PROCEDURE p_emp_sel(id int)
+        - BEGIN
+        -   SELECT * FROM emp
+        -   WHERE empno = id ;
+        - END //
+        - DELIMITER ;
+        - 입력변수가 2개 이상일 경우 : CREATE PROCEDURE p_emp_sel(id int, dept int)
+    3. 저장 프로시저의 실행
+        - 저장 프로시저는 CALL 명령어에 의해 실행
+        - 사원번호가 7566인 사원의 모든 정보를 보인다.
+        - CALL p_emp_sel(7566) ;
+        - 저장 프로시저의 실행은 SQL문(SELECT문)을 실행한 것과 같이 화면에서 결과 확인 가능
+- 저장 프로시저에 사용되는 문법
+    1. 주석문 
+        - `/**/`
+        - `#` 또는 `--` 이용
+    2. 변수의 선언과 변수에 값 저장
+        - DECLARE 변수명 자료형; --> 변수의 선언
+        - SET 변수명 = 값 --> 변수에 값 저장
+        - 변수의 선언과 동시에 값 저장
+            - DELARE pi DECIMAL (5,2) DEFAULT 3.14;
+        - 변수 pi의 값 출력
+            - SELECT pi ;
+        - 변수를 선언하고 값을 저장해 어떤 알고리즘을 위해 사용할 수 있음
+        - SQL문의 실행 결과를 생성한 변수에 저장할 수 있음
+    3. 비교문
+        - `IF .. END IF`
+        - `IF .. ELSE .. END IF`
+        - IF 비교조건 THEN
+            비교조건 만족시 실행할 명령문1 ;
+            비교조건 만족시 실행할 명령문N ;
+        - END IF
+        - IF 비교조건 THEN
+            비교조건 만족시 실행할 명령문 ;
+        - ELSE
+            비교조건 불만족시 실행할 명령문 ;
+        - END IF
+    4. 반복문
+        - 일반 프로그래밍 언어는 대부분 반복문으로 FOR문을 제공하지만, MySQL에서는 FOR문을 제공하지 않음
+        - MySQL은 WHILE문과 REPEAT문을 제공함
+        - WHILE 비교조건 DO
+            명령문1 ;
+            명령문N ;
+        - END WHILE
+        - 1~100의 합을 출력하는 코드
+            - DECLARE count int DEFAULT 1 ;
+            - DECLARE sum int DEFAULT 0 ;
+            - WHILE count <= 100 DO
+                SET sum = sum + count ;
+                SET count = count + 1 ;
+            - END WHILE
+            - SELECT sum ;
