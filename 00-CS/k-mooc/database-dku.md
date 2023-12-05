@@ -791,3 +791,39 @@
                 SET count = count + 1 ;
             - END WHILE
             - SELECT sum ;
+# 사용자 정의 함수
+- 특징
+    - 데이터베이스에 저장되는 프로그램의 한 종류
+    - 내장 함수와는 다르게 반드시 SQL문 안에서 사용(독자 사용 불가)
+    - RETURN값이 있음
+    - MySQL의 경우, 시스템 파라미터 : SET GLOBAL log_bin_trust_function_creators = 1; 을 통해 접근/사용 권한 부여
+- 문법
+    - 저장 프로시저의 문법과 동일
+    - DELIMITER //
+    - CREATE FUNCTION 함수 이름(입력변수 리스트)
+        RETURNS 반환 값의 자료형
+    - BEGIN
+        명령문들 ;
+        RETURN 반환 값 ;
+    - END //
+    - DELIMITER ;
+- 급여액을 입력하면 높은 연봉인지 낮은 연봉인지 알려주는 사용자 정의 함수
+    - DELIMITER //
+    - CREATE FUNCTION f_grade(value decimal(8,2)) --> 사용자 정의 함수 f_grade
+        RETURNS varcahr(40)
+    - BEGIN
+        DECLARE grade varchar(40) ;
+        SET grade = 'Low salary' ;
+        IF (value > 2500) THEN
+            SET grade = 'High salary' ;
+        END IF ;
+        RETURN grade ;
+    - END //
+    - DELIMITER ;
+- 저장 프로시저와 차이점
+    - 저장 프로시저
+        - CALL 함수를 이용해서 SQL문과 상관없이 실행 가능
+        - 반환값 없음
+    - 사용자 정의 함수
+        - 반드시 SQL문에서만 실행 가능
+        - 반드시 반환되는 RETURN 값이 있음
