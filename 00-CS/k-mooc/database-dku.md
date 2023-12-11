@@ -858,3 +858,20 @@
 - 데이터 모델링(논리적 설계)의 결과 : ERD
     - Entity Relationship Diagram
     - 테이블 기술서 등
+
+# ERD
+- Entity Relationship Diagram
+- 논리적 DB설계(데이터 모델링)의 결과물
+- 데이터베이스 용어와 모델링 용어
+    - 테이블(table) = 엔티티(entity)
+    - 컬럼(column), 열 = 속성(attribute)
+    - 튜플(tuple), 행(row) = 인스턴스(instance)
+    - 기본키(primary key) = 주식별자(primary identifier)
+    - 외래키(foreign key) = 외래 식별자(foreign identifier)
+- ERD : 현실 세계의 정보와 정보들의 관계를 개념화하여 표현한 것
+- 표기법
+    - 까마귀발 표기법(Crow's foot)
+    - 엔티티 : 업무의 관심 대상이 되는 정보를 갖고 있거나 그에 대한 정보를 관리할 필요가 있는 유형, 무형의 사물(개체)
+    - 속성 : 엔티티에서 관리해야할 최소 단위의 정보 항목, 테이블의 컬럼으로 구현
+    - 주식별자와 외래식별자 : 기본키(primary key)와 외래키(foreign key)에 대응하는 개념
+    - 관계 : 두 엔티티 사이의 관련성을 나타내는 용어, 두 엔티티가 외래 식별자에 의해서 연결되어 있다는 것을 의미 => 참조 관계
