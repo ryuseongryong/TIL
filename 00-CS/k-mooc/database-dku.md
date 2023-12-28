@@ -1175,3 +1175,30 @@
         - 트랜잭션 수행 시 타임스탬프 설정
         - 상대 트랜잭션이 로킹을 해제하기를 기다리는 시간이 제한시간을 넘어가면 rollback
         - 트랜잭션을 철회하고 스케줄에 새로 진입시킴
+
+# 앱 개발을 위한 준비
+- 실습내용
+    - 텍스트 프로그램
+    - GUI 프로그램
+    - 설치 요소
+        - MySQL: DBMS
+        - python: 앱 개발 언어
+        - pymysql: MySQL연동 python library
+        - PyQT5: GUI프로그래밍을을 위한 python library
+        - Spyder: 프로그램개발 IDE
+- 파이썬의 설치 추천
+    - anaconda설치
+    - conda install pymysql
+    - (without anaconda) pip install pyqt5, pip install pyqt5-tools
+- MySQL 접속 테스트
+    ```
+    import pymysql
+
+    host = 'localhost'
+    user = 'root'
+    pw = '1234'
+    db = 'my_db'
+
+    conn = pymysql.connect(host = host, user = user, password = pw, db = db)
+    print(conn)
+    ```
