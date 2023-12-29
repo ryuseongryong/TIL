@@ -1202,3 +1202,57 @@
     conn = pymysql.connect(host = host, user = user, password = pw, db = db)
     print(conn)
     ```
+
+# 사원 정보 조회 앱
+```
+sql = "SELECT * FROM emp LIMIT 10"
+
+curs = conn.cursor()
+curs.execute(sql)
+data = curs.fetchall()
+type(data)
+data
+data[0]
+str(data[0][0])
+
+curs.close()
+conn.close()
+```
+
+- 내장 SQL(embedded SQL) : 프록램 안에 서술된 SQL
+- SQL의 실행과정
+    - curs = conn.cursor() : 커서 객체 생성
+    - curs.execute(sql) : SQL문 실행
+    - python program : execute(sql) -(SQL문 실행 요청)-> MySQL DBMS -(실행 결과를 버퍼에 저장)-> buffer(cursor) -(버퍼에 저장된 결과를 읽는다)-> python program : fetchall()
+    - fetchall() : 전체를 한번에 읽음
+    - fetchone() : 한 번에 한 행씩 읽음
+    - 페치(fetch) : 버퍼에서 데이터를 가져오는 것
+- SQL의 실행 결과
+    - type(data) : tuple
+    - data : ((Decimal('1234'),'ABCD',datetime.date(1999, 12, 31), None), (...), ...)
+    - data[0] : (Decimal('1234'),'ABCD',datetime.date(1999, 12, 31), None)
+    - str(data[0][0]) : '1234'
+- 사원정보를 한 행씩 출력하기
+    ```
+    import pymysql
+
+    host = 'localhost'
+    user = 'root'
+    pw = '1234'
+    db = 'my_db'
+
+    conn = pymysql.connect(host = host, user = user, password = pw, db = db)
+    print(conn)
+
+    sql = "SELECT * FROM emp LIMIT 10"
+
+    curs = conn.cursor()
+    curs.execute(sql)
+    row = curs.fetchone()
+    while(row):
+        print(row)
+        row = curs.fetchone()
+    
+    curs.close()
+    conn.close() # --> 명시적으로 끊어주는 것이 안전함
+    ```
