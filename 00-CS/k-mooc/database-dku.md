@@ -1256,3 +1256,31 @@ conn.close()
     curs.close()
     conn.close() # --> 명시적으로 끊어주는 것이 안전함
     ```
+
+# 부서 정보 입력 앱
+```
+import pymysql
+
+host = "localhost"
+user = "root"
+pw = "1234"
+db = "my_db"
+
+conn = pymysql.connect(host = host, user = user, password = pw, db = db)
+
+print(conn)
+
+deptno = 60
+dname = "DEVELOP"
+loc = "SEOUL"
+
+sql = "INSERT INTO dept values (%s, %s, %s)"
+vals = (deptno, dname, loc)
+
+curs = conn.cursor()
+curs.execute(sql, vals)
+conn.commit() # 실행결과를 데이터베이스에 보내고 저장하라는 명령
+
+curs.close()
+conn.close()
+```
