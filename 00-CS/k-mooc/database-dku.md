@@ -1284,3 +1284,99 @@ conn.commit() # 실행결과를 데이터베이스에 보내고 저장하라는 
 curs.close()
 conn.close()
 ```
+
+# 사원 정보 조회 GUI 앱
+```
+import sys
+import pymysql
+from PyQt5.QtWidgets import *
+
+def connectDB():
+    host = "localhost"
+    user = "root"
+    pw = "4321"
+    db = "my_db"
+
+    conn = pymysql.connect(host = host, user = user, password = pw, db = db)
+    
+    return(conn)
+
+def disconnectDB(conn):
+    conn.close()
+
+class MyApp(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+    
+    def initUI(self):
+        label1 = QLabel('ID')
+        label2 = QLabel('ename')
+        label3 = QLabel('job')
+        label4 = QLabel('department')
+
+        self.text_id = QTextEdit()     
+        self.text_id.setFixedWidth(200)
+        self.text_id.setFixedHeight(30)
+
+        btn_1 = QPushButton('Query')
+        btn_1.clicked.connect(self.btn_1_clicked)
+
+        self.text_ename = QTextEdit()
+        self.text_ename.setFixedWidth(200)
+        self.text_ename.setFixedHeight(30)
+
+        self.text_job = QTextEdit()
+        self.text_job.setFixedWidth(200)
+        self.text_job.setFixedHeight(30)
+
+        self.text_dept = QTextEdit()
+        self.text_dept.setFixedWidth(200)
+        self.text_dept.setFixedHeight(30)
+
+        gbox = QGridLayout()
+        gbox.addWidget(label1, 0, 0)
+        gbox.addWidget(self.text_id, 0, 1)
+        gbox.addWidget(btn_1, 0, 2)
+        gbox.addWidget(label2, 1, 0)
+        gbox.addWidget(self.text_ename, 1, 1)
+        gbox.addWidget(label3, 2, 0)
+        gbox.addWidget(self.text_job, 2, 1)
+        gbox.addWidget(label4, 3, 0)
+        gbox.addWidget(self.text_dept, 3, 1)
+
+        self.setLayout(gbox)
+        self.setWindowTitle('My Program')
+        self.setGeometry(300,300, 480,250)
+        self.show()
+
+    def btn_1_clicked(self):
+        empno = self.text_id.toPlainText()
+
+        sql = "SELECT ename, job, dname \
+               FROM emp e, dept d \
+               WHERE e.deptno = d.deptno \
+               and empno = %s"
+        
+        conn = connectDB()
+        curs = conn.cursor()
+        curs.execute(sql, empno)
+
+        result = curs.fetchone()
+        self.text_ename.setText(result[0])
+        self.text_job.setText(result[1])
+        self.text_dept.setText(result[2])
+
+        curs.close()
+        disconnectDB(conn)
+
+if (__name__ == '__main__'):
+    app = QApplication(sys.argv)
+    ex = MyApp()
+    sys.exit(app.exec_())
+```
+
+- SQL문은 파이썬과 같은 언어 안에서도 사용될 수 있다.
+- 데이터베이스에서 가져온 정보는 버퍼에 저장이 된다.
+- 버퍼에 있는 정보는 fetchall() 또는 fetchone()을 통해 프로그램 내부로 가져온다.
+- 윈도우 프로그램은 화면을 디자인 하는 부분을 포함한다.
