@@ -1,0 +1,12 @@
+- logRetentionDuration은 저장되는 델타 테이블 로그의 보존 기간을 정하는 것이다.
+- 왜 보존 기간을 정해야 하는가?
+    - 델타 테이블 구조 상, 데이터의 추가/삭제는 델타 테이블 로그에 의해서 이루어진다. 따라서 별도의 retention 과정이 없다면, 델타 로그는 무한히 증가한다.
+    - 사용자에 의해 정해진 로그 commit 실행 주기에 의해 로그가 생성되는데, 이 주기 내에 발생한 add, remove 등의 동작들이 로그에 저장된다. (아무런 동작을 하지 않더라도 로그는 생성되는 것 같음)
+- 그렇다면 보존 기간에 의해 삭제되는 로그가 있다면 델타 테이블에 문제가 발생하는 건 아닐까?
+    - 로그를 보존 기간에 의해 삭제하려면, 기존 로그를 다른 방법으로 보존해야만 한다. 보존 기간 없이 기존 로그를 계속해서 유지하면, 모든 데이터의 버저닝이 가능하다.
+        - 예를 들어 A, B, C 데이터를 차례로 삽입하고 B데이터를 삭제하는 경우, 델타 로그는 add A, add B, add C, remove B 로그를 작성한다.
+        - 이후 리텐션에 의해 add A 로그를 삭제하게 되면 델타 테이블에서 A 데이터는 없는 데이터로 인식된다.
+        - 따라서 로그 리텐션을 사용하기 위해서는 add A 로그를 보존할 수 있어야 하는데, 이 로그를 보존하는 것은 checkpoint의 생성이다.(https://docs.databricks.com/en/delta/best-practices.html)
+- 결국 logRetentionDuration은 델타 테이블 로그의 보존 기간을 정하는 것이고, 보존 기간을 초과한 로그는 삭제된다.
+
+- delta.logRetentionDuration = "interval <interval>": 테이블에 대한 기록이 유지되는 기간을 제어합니다. 기본값은 interval 30 days입니다.(https://learn.microsoft.com/ko-kr/azure/databricks/delta/history#--configure-data-retention-for-time-travel-queries)
