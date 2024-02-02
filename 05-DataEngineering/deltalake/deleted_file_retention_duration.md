@@ -1,0 +1,6 @@
+- deletedFileRetentionDuration은 현재 델타 테이블에서 삭제된 파일을 실제로 언제까지 보존할지 기간을 정하는 것이다.
+- 델타 테이블에서는 삭제된 데이터를 로그로 정의하기 때문에 실제 데이터는 제거되지 않는 것이 기본 원칙이다. 하지만 데이터가 많아지고, 과거 버저닝을 필요로 하지 않는 경우에는 로그도 합치고, 실제 삭제된 데이터를 제거해도 무방하기 때문에 이 같은 옵션을 통해서 제거한다.
+- 다만 문제가 될 수 있는 부분은 이런 경우이다.
+    - deletedFileRetentionDuration이 7일인 경우, 해당 테이블을 참조하는 쿼리가 10일이 걸린다고 할 때, vacuum 동작이 deletedFileRetentionDuration에 적절하게 설정된 경우, 문제가 발생한다.
+    - 2/1에 현재일 기준으로 7일 내 데이터가 포함되는 쿼리를 실행하는 경우, 쿼리 완료까지 7일 이상이 걸린다고 가정할 때, 2/1 기준으로 존재하는 파일이 변경되는 경우, deletedFileRetentionDuration에 의해 파일이 삭제되어 2/1 기준에 존재하는 파일이 실제 쿼리가 진행되는 2/1+n에는 변경되어 문제가 발생할 수 있다.
+    - 따라서 deltedFileRetentionDuration은 쿼리를 실행하는 현재 시간에서 deletedFileRetentionDuration을 벗어나는 시간의 데이터를 대상으로 쿼리를 하는 것이 가장 안전하고, 쿼리를 실행하는 시간 기준으로 deletedFileRetentionDuration 내에 있는 경우 쿼리 소요 시간에 따라 문제가 발생할 수 있다.
