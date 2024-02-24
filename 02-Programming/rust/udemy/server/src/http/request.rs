@@ -1,3 +1,5 @@
+use std::str::Utf8Error;
+use std::str;
 use super::method::Method;
 use std::convert::TryFrom;
 use std::error::Error;
@@ -9,22 +11,27 @@ pub struct Request {
     method: Method,
 }
 
-impl Request {
-    fn from_byte_array(buf: &[u8]) -> Result<Self, String> {}
-}
-
 impl TryFrom<&[u8]> for Request {
     type Error = ParseError;
 
     //? GET /search?name=abc&sort=1 HTTP/1.1
     fn try_from(buf: &[u8]) -> Result<Self, Self::Error> {
-        // let string = String::from("asd");
-        // string.encrypt();
-        // buf.encrypt();
+        // match str::from_utf8(buf) {
+        //     Ok(request) => {},
+        //     Err(_) => return Err(ParseError::InvalidEncoding),
+        // }
+
+
+        // match str::from_utf8(buf).or(Err(ParseError::InvalidEncoding)) {
+        //     Ok(request) => {},
+        //     Err(e) => return Err(e),
+        // }
+
+        let request = str::from_utf8(buf)?;
+
         unimplemented!()
     }
 }
-
 
 pub enum ParseError {
     InvalidRequest,
@@ -41,6 +48,12 @@ impl ParseError {
             Self::InvalidProtocol => "Invalid Protocol",
             Self::InvalidMethod => "Invalid Method",
         }
+    }
+}
+
+impl From<Utf8Error> for ParseError {
+    fn from(_: Utf8Error) -> Self {
+        Self::InvalidEncoding
     }
 }
 
