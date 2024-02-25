@@ -16,23 +16,20 @@ impl TryFrom<&[u8]> for Request {
 
     //? GET /search?name=abc&sort=1 HTTP/1.1
     fn try_from(buf: &[u8]) -> Result<Self, Self::Error> {
-        // match str::from_utf8(buf) {
-        //     Ok(request) => {},
-        //     Err(_) => return Err(ParseError::InvalidEncoding),
-        // }
-
-
-        // match str::from_utf8(buf).or(Err(ParseError::InvalidEncoding)) {
-        //     Ok(request) => {},
-        //     Err(e) => return Err(e),
-        // }
-
         let request = str::from_utf8(buf)?;
 
         unimplemented!()
     }
 }
 
+fn get_next_word(request: &str) -> Option<(&str, &str)> {
+    for (i, c) in request.chars().enumerate() {
+        if c == ' ' {
+            return Some((&request[..i], &request[i + i..]));
+        }
+    }
+    None
+}
 pub enum ParseError {
     InvalidRequest,
     InvalidEncoding,
