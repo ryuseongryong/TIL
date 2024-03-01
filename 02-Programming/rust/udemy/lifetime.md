@@ -1,0 +1,2 @@
+- https://rinthel.github.io/rust-lang-book-ko/ch10-03-lifetime-syntax.html
+- 라이프타임은 어떤 참조에 대한 수명을 표시하고 제약을 걸어서 안전성을 확보할 수 있는 문법요소
