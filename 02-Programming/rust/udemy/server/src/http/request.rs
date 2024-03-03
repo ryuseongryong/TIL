@@ -31,7 +31,6 @@ impl<'buf> TryFrom<&'buf [u8]> for Request<'buf> {
         let method: Method = method.parse()?;
 
         let mut query_string = None;
-
         if let Some(i) = path.find('?') {
             query_string = Some(&path[i + 1..]);
             path = &path[..i];    
