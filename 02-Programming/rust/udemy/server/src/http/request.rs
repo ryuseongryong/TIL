@@ -1,6 +1,5 @@
 use std::str::Utf8Error;
-use std::{path, str};
-use crate::http::method;
+use std::{str};
 
 use super::method::{Method, MethodError};
 use std::convert::TryFrom;
