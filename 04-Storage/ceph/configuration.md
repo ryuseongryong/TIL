@@ -8,4 +8,3 @@
 
 (1) global
 (2) mon, mgr, osd, mds, client
-(3)
