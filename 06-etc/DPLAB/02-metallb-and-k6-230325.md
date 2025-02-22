@@ -1,0 +1,170 @@
+- MetalLB 를 이용한 네트워크 최적화 (김인혁)
+- K6 를 이용한 성능 분석/검증 (신은환)
+- 모임의 취지
+    - 잉클 제품 중 일부를 오픈소스화 계획인데, 회사 소유물로 오픈소스하기 어려워서 모임을 만들어서 진행하기 위해
+    - DPLap(Data Platform Lap) 세미나, 기술 블로그
+    - 4월 오픈소스 개발 진행
+    - K8S + Data(Delta Lake)
+    - 1개월 1회 오프라인 모임(발표 + 고민중인 것들)
+
+# Load Balancer on K8S
+
+- [https://medium.com/dataplatform-lab/k8s-cilium-nodeport-서비스-1bbb8ffd9e6e](https://medium.com/dataplatform-lab/k8s-cilium-nodeport-%EC%84%9C%EB%B9%84%EC%8A%A4-1bbb8ffd9e6e)
+- [https://medium.com/dataplatform-lab/k8s-kafka-네트워크-최적화-metallb-fa59729086ea](https://medium.com/dataplatform-lab/k8s-kafka-%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC-%EC%B5%9C%EC%A0%81%ED%99%94-metallb-fa59729086ea)
+- micro architecture 환경에서 network가 점점 중요해짐
+- kafka를 사용
+    - broker replicas 3, 
+    boot strap을 통해서 client가 데이터를 쏘기 위해 bootstrap을 통해 broker 주소를 받아와서 
+    토픽이 있는 broker로 데이터를 전송, broker의 IP가 Node IP nodeport로 사용중이었음
+    - nodeport를 통해 접속하게 되면 서비스 endpoint로 전달이 되고, services에서 모든 pod로 roundrobin 정책으로 전달하면서 불필요한 트래픽이 늘어남
+- K8S Services type 중 Load Balancer type
+    - kafka nodeport → load balancer로 문제 해결
+    - k8s load balancer를 사용하기 위해서는 추가적인 컴포넌트가 필요함
+- NodePort with DSR(응답 메시지 바로 전송 가능하지만, 프로덕션에서 사용하기 힘듦)
+    - 클라이언트가 임의로 노드로 패킷 전송
+        - 해당 서비스의 엔드포인트(파드)가 동작중인 노드로 패킷 전달
+        - 서비스에 따라 노드 간 터널링이 발생함
+        - direct server return(쿠버네티스 외에도 발생하는 문제)
+            - 일반적으로도 packet→ LB → server1 → LB → target 과 같이 발생함
+            - LB → server1 → client(target) : direct server return; DSR
+            - DSR을 위해서는 node가 client IP를 알아야 하는데, packet header에 client IP를 실어서 전송
+- 쿠버네티스의 최적화는 네트워크 위주
+    - etcd를 외부로 빼는 작업이 있음
+- LoadBalancer
+    - client가 내가 사용할 서비스의 endpoint가 정확히 어디있는지를 모르는 것이 문제의 시작(알 수 없음)
+    - k8s에서 pod가 어디에 할당되는지 예상할 수 없음
+    - LB 사용 → external IP 생성, 지정한 범위 내의 IP가 할당, 240 → target pod로 접속
+    - 이를 위해서 IP를 pod이 할당된 node에 할당해줘야함
+    - pod3 → node1 → 240 IP
+    - pod1 → node3 → ?
+    - 일반적으로 LB 를 metal LB에서 사용
+- MetalLB with L2
+    - on premise LB는 metalLB가 유일(cilium도 있긴 한듯)
+    - EKS, 등 에서는 서비스에서 자체 LB 제공
+    - Daemon형태 스피커 pod가 각 노드에 설치됨
+    - L2 mode에서 스피커가 ARP request를 가져감
+    - 클라이언트에서 240으로 패킷을 보내려고 하면, 240(IP)네트워크를 위한 것이고 실제로는 mac 주소가 필요. IP netmask 가 같은 네트워크 대역에 있으면, 240 mac 주소를 알려달라는 것이 ARP, 다른 주소면 router의 mac 주소를 알려달라고 함. 실제 packet을 주는 것은 ARP 요청을 통해 전달받는 맥주소로 전송하는 것
+    - 클라이언트가 kafka broker service 0이 node1에 있는 것을 아고 있고, external IP가 240인 것을 알고 있으면 ARP REQ가 날아가고 240 MACADDR를 받고, metal LB daemon이 node1 Speaker가 ARP Reply를 하고 해당 MACADDR를 응답하고 해당 broker를 전달함
+        - 문제는 서비스의 파드가 여러개인 경우, ARP REQ에 여러것들이 응답할 수 없음. L2모드에서 리더로 선출된 스피커가 ARP응답. 이경우 할당에 따라 왔다갔다 처리함(1번은 바로 처리, 2번은 터널링해서 처리)
+        - 이 때문에 BGP 모드
+- MetalLB with BGP
+    - 스피커가 BGP 라우팅 테이블을 등록해서 로드밸런싱 구현
+        - 해당 서비스의 엔드포인트(파드)가 동작 중인 노드의 스피커가 BGP 라우팅 테이블 등록
+        - 해당 서비스의 엔드포인트가 2개 이상일 경우, 라우터가 제공하는 로드밸런싱 활용 가능
+        - L2와 다른 것은 ECMP간단한 로드밸런싱 기능을 제공하기 때문에 내부적으로 분산 처리 가능
+        - 기본적으로 라우터의 퍼포먼스가 필요함
+- IP는 서비스에 미리 할당, external IP에 할당되어 있음
+    - 서비스의 external IP table에 미리 정해져있고, DNS로 가능
+    - IP를 정해놓고 LB로 설정
+    - 의구심 : DNS에 201를 할당하고 해당 DNS로 접속하면 되는데? K8S에서 pod을 관리하기 때문에 LB가 필요함
+- Question(metalLB의 정확한 작동방식)
+    - Istio ingress contoller type load balancer, clusterIP + metalLB externalIP가 할당 됨
+    - external IP range 할당, LB ip를 고정시키고 재설치할 때 바뀔 수 있음
+- 스토리지 쪽은 큰 발전이 없음
+    - Ceph
+    - Nvme??
+    - SeaweedFS
+    - memory + network가 기술적으로 중요한 부분
+- Network의 목적은 불필요한 터널링을 막는 것
+    - Node간 터널도 direct tunneling
+    - Node간 터널링을 줄이는 것
+    - 이 부분이 모두 SNAT를 사용하는 것
+    - Node간 통신을 줄이는 것이 있고, 최적화를 제공하는 것이 Cilium
+- Service 역할이 기본적으로 LB
+    - metalLB 역할은 service의 pod LB에서 pod이 할당되는 곳으로 바로 요청이 갈 수 있도록 도와주는 것
+    - node IP를 직접 쓰는 것은 node가 out되면 해당 서비스를 이용하지 못함
+- Cilium은 metalLB 없이 동작하는데 많이 사용되는지는 검증되지 않음
+- roxy LB
+    - ebpf LB
+- ARP, BGP 조작을 하는 것은 eBPF가 해주는 역할
+    - Cilium이 eBPF를 만들고 나서 calico도 지원
+    - Cilium 창업자들이 kernel eBPF maintainer이기 때문에 code가 Cilium에서 사용하는 것이 많음
+- kafka는 broker별로 service를 사용해도 무방함
+- 잉클에서 사용하는 deltasharing의 목적?
+    - governance, sharing까지 아니더라도 sharing의 목적은 data를 쌓아놨을 때 data를 이용하는 경우, backend 쪽에서 data를 조금씩 가져오는 경우가 많은데, 작은 데이터를 가져올 때 spark trino를 쓰면 비효율적이기 때문에 deltastore를 사용하면 빠르게 사용(1초 내)가능
+    - data mart 계획이 있음
+    - data clean room?
+    - 정책, topology는 정하기 나름
+    - 접근 제어 등을 효과적으로 처리하면서 공유하는 기술이 또 다른 목적
+- 오르다(네이버에서 하다가 대표가 옮겨가면서 프로젝트가 이동중)
+    - https://github.com/orda-io
+
+# 오픈소스 부하테스트 도구로 트래픽 측정하기
+
+- k6는 엔지니어를 위한 오픈소스 부하 테스트 도구
+    - 무료, 개발자 중심, 커뮤니티, 액티비티, 확장 가능
+- Devops 컨셉의 보편화로 빠른 배포와 테스팅이 필요함
+    - 일회성 테스트 → 지속적인 테스트 요구 증가
+    - k6는 엔지니어가 쉽고 생산적으로 부하테스트를 수행할 수 있도록 함
+- 클라우드 컴퓨팅 확산 → scale out → 빈번한 인프라 구성 → 빠르고 정확하게 지속적으로 → devops 컨셉의 보편화
+- 특징
+    - 쉽게 시작, 초반 러닝 커브가 낮음
+    - 문서화가 API~블로그까지 잘 되어 있음
+    - 고성능, 싱글머신으로 테스트 가능
+    - Web APP, API 테스트 지원(k6 core)
+    - k6확장 버전(xk6)로 다양한 테스트가능
+    - 스크립트 JS ES6 지원
+    - Go로 구현
+    - 로컬, 클라우드 기반 테스트 환경 제공
+    - 다양한 출력 포맷 지원, 외부 플랫폼으로 결과 스트리밍 가능
+        - AWS Cloud watch
+        - datadog etc.
+- 적용 사례
+    - 하루 인베스트먼트 : 암호화폐 이자지급 은행
+    - 이자 지급 시, 한 번에 접속하여 백엔드 과부하
+    - ECS를 사용하는데 auto scaling이 장애를 따라가지 못함
+    - 타임딜 이벤트 이전에 적절한 스펙 확인이 필요
+        - 기존에는 ECS fargate를 사용, 필요 시 scale out, 스펙 2~4배 상향으로 적용
+    - 과정
+        - 테스트 인프라 구축
+            - Terraform 배포
+            - BE
+            - FE(API 내결함성 위주 테스트를 위해 제외)
+            - DB(Production DB dump secure처리)
+            - CICD
+        - 스파이크 테스트(한번에 증가시키는 테스트)로 진행
+            - 점진적 과부하 테스트도 있음
+            - RPS(초당 요청) 목표치 설정 : 300건 - Test tool이 보내는 기준, operation 1개가 RPS 1.인줄 알았으나, 1회 https request가 1 RPS
+            - Latency(응답 속도) 목표치 설정 : p95 1000ms(95% 유저가 1000ms 내 응답)
+            - reponse size는 목표를 잡고, fail load 구성, RPS에 맞춰서 진행
+        - 테스트 계획
+            - 시나리오 : 초기 화면 → 타임딜 페이지 → 구매 요청
+                - 로그인 : refresh token으로 진입하는 경우가 많아서 제거
+                - 초기 화면 진입 : access token 중 무작위로 선택하여 인증 요청
+                    - 인증 백엔드는 백엔드 API 서버에 같이 물려있음(python jango)
+                - 타임딜 페이지 이동
+                - 타임딜 상품 구매
+                - 구매 요청
+            - 트래픽 구성
+                - 개발자 도구 - nerwork - fetch/XHR
+                - chrome extension k6 browser recorder
+                - 자동으로 스크립트 작성
+        - 테스트 실행 및 모니터링
+            - 모니터링 지표
+                - Latency
+                    - avg. p95
+                        - datadog
+                - CPU Utilization
+                    - ECS
+                        - AWS console
+                        - vmstat
+                            - r(runqueue) - CPU 자원을 실행 / 대기 중인 테스크 수를 보여줌. CPU 코어 수 이상으로 증가할 경우 bottleneck이 존재하는 것으로 볼 수 있음
+                            - id(idle) : 유휴 CPU 자원의 백분율, 0에 가까울 수록 서버가 요청에 응답하지 못하는 장애가 발생할 수 있음
+                        - auto scale시에 최초 실행 시에 CPU 사용량이 급격히 증가하면서 사용하기 어려운 부분이 있음
+                            - istio sidecar로 traffic monitoring 지원가능, KEDA DB 등 지원, kafka latency leg 지원 등
+                        - top : 자원 및 프로세스 사용 현황을 확인
+                    - RDS
+                        - AWS console
+            - 결과
+                - 목표 RPS를 기준으로 반복 테스트
+            - 결과 반영
+                - 조건 RPS 300, p95 1000ms
+                - ECS 4vCPUs 8GB 20Tasks, RDS 4xlarge… etc.
+            - 서비스 병목 지점 원인 파악
+                - ECS : r에 쌓이는 테스트 쿠가 코어에 가깝게 vCPU 증가 시킴
+                - RDS : CPU Utilization에 큰 변화가 없음(DB 자체 slow query가 의심되지만 정확한 확인이 필요함), datadog에서 확인 가능 - memory쪽으로 추정
+        - 결론
+            - 단순 outage, over-deployment를 막을 수 있었음
+    - 추가 적으로 vus(virtual user)
+    - req → res 초당 req가 많아지면, test tool의 size가 누적되고 load test tool이 죽어서 테스트가 진행되지 않음
+    - 하드웨어를 고려하면서 테스트 진행
