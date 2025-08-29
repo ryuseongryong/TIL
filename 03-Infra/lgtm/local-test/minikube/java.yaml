@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-petclinic-otel
+  namespace: test
+  labels: { app: spring-petclinic-otel }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: spring-petclinic-otel } }
+  template:
+    metadata:
+      labels: { app: spring-petclinic-otel }
+    spec:
+      volumes:
+        - name: otel-auto
+          emptyDir: {}
+        - name: logback-cfg
+          configMap:
+            name: logback-traceid
+      initContainers:
+        - name: otel-agent-downloader
+          image: curlimages/curl:8.9.1
+          command: ["sh","-ceu"]
+          args:
+            - |
+              set -o pipefail
+              curl -fsSL \
+                https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar \
+                -o /otel/opentelemetry-javaagent.jar
+              ls -lh /otel
+          volumeMounts:
+            - name: otel-auto
+              mountPath: /otel
+      containers:
+        # 애플리케이션
+        - name: app
+          image: springcommunity/spring-framework-petclinic:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: otel-auto
+              mountPath: /otel
+            - name: logback-cfg
+              mountPath: /opt/logcfg
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 15   # 앱 기동 여유
+            periodSeconds: 5
+            timeoutSeconds: 3         # 기본 1s → 3s로
+            failureThreshold: 6       # 최대 30s(5*6)까지 기다림
+          env:
+
+            # ---- OTel Java agent 붙이기
+            - name: JAVA_TOOL_OPTIONS
+              value: >-
+                -javaagent:/otel/opentelemetry-javaagent.jar
+                -Dlogging.config=/opt/logcfg/logback-spring.xml
+                -Dmanagement.endpoints.web.exposure.include=health,prometheus
+                -Dmanagement.endpoint.health.probes.enabled=true
+                -Dmanagement.health.probes.enabled=true
+                -Dmanagement.server.port=8080
+
+            - name: SPRING_CONFIG_ADDITIONAL_LOCATION
+              value: "file:/opt/logcfg/"
+
+            # ---- 서비스명
+            - name: OTEL_SERVICE_NAME
+              value: spring-petclinic
+
+            # ---- OTLP gRPC → Alloy(ClusterIP)
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: grpc
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://alloy.observability.svc.cluster.local:4317
+
+            # ---- 어떤 신호를 보낼지
+            - name: OTEL_TRACES_EXPORTER
+              value: otlp
+            - name: OTEL_LOGS_EXPORTER
+              value: otlp
+            - name: OTEL_METRICS_EXPORTER
+              value: none
+            - name: OTEL_TRACES_SAMPLER
+              value: always_on
+
+            # ---- 로그 상관관계(MDC) 활성화
+            - name: OTEL_INSTRUMENTATION_LOGBACK_MDC_ENABLED
+              value: "true"
+            # ---- Spring Boot 로깅을 확실히 패턴 적용 (console + level)
+            - name: SPRING_APPLICATION_JSON
+              value: |
+                {
+                  "server": { "port": 8080, "address": "0.0.0.0" },
+                  "logging": {
+                    "level": { "root": "INFO" },
+                    "pattern": {
+                      "console": "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger - %msg trace_id=%X{trace_id} span_id=%X{span_id}%n"
+                    }
+                  }
+                }
+
+        # 간단한 로드 제너레이터(주기적으로 요청해서 trace/MDC가 생기도록)
+        - name: ping
+          image: curlimages/curl:8.9.1
+          command: ["sh","-ceu"]
+          args:
+            - |
+              echo "Waiting for HTTP 200 from app:8080 ..."
+              until curl -fsS http://127.0.0.1:8080/ >/dev/null; do
+                sleep 1
+              done
+              echo "App is ready. Start periodic pings."
+              while true; do
+                if curl -fsS http://127.0.0.1:8080/ >/dev/null; then
+                  echo "$(date -Is) ping OK"
+                else
+                  echo "$(date -Is) ping FAIL"
+                fi
+                sleep 10
+              done
