@@ -1,0 +1,42 @@
+{
+	"ulid": "01K4BWAQBXNA93HD73PS9ZZCX8",
+	"minTime": 1757029601766,
+	"maxTime": 1757030400000,
+	"stats": {
+		"numSamples": 12944,
+		"numFloatSamples": 12944,
+		"numSeries": 264,
+		"numChunks": 264
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01K4BWAQBXNA93HD73PS9ZZCX8"
+		]
+	},
+	"version": 1,
+	"out_of_order": false,
+	"thanos": {
+		"labels": {},
+		"downsample": {
+			"resolution": 0
+		},
+		"source": "receive",
+		"segment_files": [
+			"000001"
+		],
+		"files": [
+			{
+				"rel_path": "chunks/000001",
+				"size_bytes": 47720
+			},
+			{
+				"rel_path": "index",
+				"size_bytes": 26208
+			},
+			{
+				"rel_path": "meta.json"
+			}
+		]
+	}
+}

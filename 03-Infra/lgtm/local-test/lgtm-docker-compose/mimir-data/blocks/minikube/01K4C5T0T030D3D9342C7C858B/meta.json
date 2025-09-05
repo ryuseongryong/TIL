@@ -1,0 +1,55 @@
+{
+	"ulid": "01K4C5T0T030D3D9342C7C858B",
+	"minTime": 1757030404179,
+	"maxTime": 1757044800000,
+	"stats": {
+		"numSamples": 194870,
+		"numFloatSamples": 194870,
+		"numSeries": 264,
+		"numChunks": 1665
+	},
+	"compaction": {
+		"level": 2,
+		"sources": [
+			"01K4BX2H2EZMWCFNB7S8SG7V54",
+			"01K4C3Y8DNPD9FDMMXJ2ZVA12W"
+		],
+		"parents": [
+			{
+				"ulid": "01K4BX2H2EZMWCFNB7S8SG7V54",
+				"minTime": 1757030404179,
+				"maxTime": 1757037600000
+			},
+			{
+				"ulid": "01K4C3Y8DNPD9FDMMXJ2ZVA12W",
+				"minTime": 1757037604820,
+				"maxTime": 1757044800000
+			}
+		]
+	},
+	"version": 1,
+	"out_of_order": false,
+	"thanos": {
+		"labels": {},
+		"downsample": {
+			"resolution": 0
+		},
+		"source": "compactor",
+		"segment_files": [
+			"000001"
+		],
+		"files": [
+			{
+				"rel_path": "chunks/000001",
+				"size_bytes": 714481
+			},
+			{
+				"rel_path": "index",
+				"size_bytes": 36287
+			},
+			{
+				"rel_path": "meta.json"
+			}
+		]
+	}
+}

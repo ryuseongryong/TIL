@@ -1,0 +1,35 @@
+# version: "3.8"
+services:
+  grafana:
+    image: grafana/grafana:12.1.1
+    ports: ["3000:3000"]
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+    volumes:
+      - ./volumes/grafana:/var/lib/grafana
+      - ./volumes/provisioning:/etc/grafana/provisioning
+      - ./dashboards:/var/lib/grafana/dashboards/
+# su3omtxj6780uwi1!
+  mimir:
+    image: grafana/mimir:2.17.0
+    command: ["-config.file=/etc/mimir/mimir.yaml"]
+    ports: ["9009:9009"]
+    volumes:
+      - ./mimir:/etc/mimir
+      - ./volumes/mimir-data:/data
+
+  loki:
+    image: grafana/loki:3.5.3
+    command: ["-config.file=/etc/loki/config.yaml"]
+    ports: ["3100:3100"]
+    volumes:
+      - ./loki:/etc/loki
+      - ./volumes/loki-data:/loki
+
+  tempo:
+    image: grafana/tempo:2.8.2
+    command: ["-config.file=/etc/tempo/tempo.yaml"]
+    ports: ["3200:3200", "4317:4317", "4318:4318", "9095:9095"]
+    volumes:
+      - ./tempo:/etc/tempo
+      - ./volumes/tempo-data:/var/tempo

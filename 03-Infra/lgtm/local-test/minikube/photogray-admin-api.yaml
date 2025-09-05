@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pg-admin-api-local-test
+  labels: { app: pg-admin-api-local-test }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: pg-admin-api-local-test } }
+  template:
+    metadata:
+      labels: { app: pg-admin-api-local-test }
+    spec:
+      volumes:
+        - name: otel-auto
+          emptyDir: {}
+        - name: logback-cfg
+          configMap:
+            name: logback-traceid
+      initContainers:
+        - name: otel-agent-downloader
+          image: curlimages/curl:8.9.1
+          command: ["sh","-ceu"]
+          args:
+            - |
+              set -o pipefail
+              curl -fsSL \
+                https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar \
+                -o /otel/opentelemetry-javaagent.jar
+              ls -lh /otel
+          volumeMounts:
+            - name: otel-auto
+              mountPath: /otel
+      containers:
+        # 애플리케이션
+        - name: pg-admin-api
+          # image: 688814567323.dkr.ecr.ap-northeast-2.amazonaws.com/photogray-admin-api-dev:local-test-arm64
+          image: 688814567323.dkr.ecr.ap-northeast-2.amazonaws.com/photogray-admin-api-dev:local-test-amd64
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: otel-auto
+              mountPath: /otel
+            - name: logback-cfg
+              mountPath: /opt/logcfg
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 15   # 앱 기동 여유
+            periodSeconds: 5
+            timeoutSeconds: 3         # 기본 1s → 3s로
+            failureThreshold: 6       # 최대 30s(5*6)까지 기다림
+          env:
+
+            # ---- OTel Java agent 붙이기
+            - name: JAVA_TOOL_OPTIONS
+              value: >-
+                -javaagent:/otel/opentelemetry-javaagent.jar
+                -Dlogging.config=/opt/logcfg/logback-spring.xml
+                -Dmanagement.endpoints.web.exposure.include=health,prometheus
+                -Dmanagement.endpoint.health.probes.enabled=true
+                -Dmanagement.health.probes.enabled=true
+                -Dmanagement.server.port=8080
+
+            - name: SPRING_CONFIG_ADDITIONAL_LOCATION
+              value: "file:/opt/logcfg/"
+
+            # ---- 서비스명
+            - name: OTEL_SERVICE_NAME
+              value: spring-petclinic
+
+            # ---- OTLP gRPC → Alloy(ClusterIP)
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: grpc
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://alloy.observability.svc.cluster.local:4317
+
+            # ---- 어떤 신호를 보낼지
+            - name: OTEL_TRACES_EXPORTER
+              value: otlp
+            - name: OTEL_LOGS_EXPORTER
+              value: otlp
+            - name: OTEL_METRICS_EXPORTER
+              value: none
+            - name: OTEL_TRACES_SAMPLER
+              value: always_on
+
+            # ---- 로그 상관관계(MDC) 활성화
+            - name: OTEL_INSTRUMENTATION_LOGBACK_MDC_ENABLED
+              value: "true"
+
+            - name: OTEL_JAVAAGENT_DEBUG
+              value: "true"
+---
+apiVersion: v1
+data:
+  logback-spring.xml: |
+    <configuration scan="true">
+      <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+          <!-- MDC(trace_id, span_id) 출력 -->
+          <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger - %msg trace_id=%X{trace_id} span_id=%X{span_id}%n</pattern>
+        </encoder>
+      </appender>
+
+      <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+      </root>
+    </configuration>
+kind: ConfigMap
+metadata:
+  name: logback-traceid
+  namespace: logging-test
