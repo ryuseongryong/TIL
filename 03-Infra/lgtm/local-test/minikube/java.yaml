@@ -1,123 +1,75 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: spring-petclinic-otel
+  name: brokentelephone-java
   namespace: test
-  labels: { app: spring-petclinic-otel }
+  labels: { app: brokentelephone-java }
 spec:
   replicas: 1
-  selector: { matchLabels: { app: spring-petclinic-otel } }
+  selector:
+    matchLabels: { app: brokentelephone-java }
   template:
     metadata:
-      labels: { app: spring-petclinic-otel }
+      labels: { app: brokentelephone-java }
+      annotations:
+        # ── Alloy가 Prometheus 방식으로 스크레이프하도록 Pod에 주석
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9464"
+        prometheus.io/path: "/metrics"
     spec:
-      volumes:
-        - name: otel-auto
-          emptyDir: {}
-        - name: logback-cfg
-          configMap:
-            name: logback-traceid
-      initContainers:
-        - name: otel-agent-downloader
-          image: curlimages/curl:8.9.1
-          command: ["sh","-ceu"]
-          args:
-            - |
-              set -o pipefail
-              curl -fsSL \
-                https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar \
-                -o /otel/opentelemetry-javaagent.jar
-              ls -lh /otel
-          volumeMounts:
-            - name: otel-auto
-              mountPath: /otel
+      terminationGracePeriodSeconds: 5
       containers:
-        # 애플리케이션
         - name: app
-          image: springcommunity/spring-framework-petclinic:latest
+          image: brokentelephone:java
           imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 8080
-          volumeMounts:
-            - name: otel-auto
-              mountPath: /otel
-            - name: logback-cfg
-              mountPath: /opt/logcfg
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 8080
-            initialDelaySeconds: 15   # 앱 기동 여유
-            periodSeconds: 5
-            timeoutSeconds: 3         # 기본 1s → 3s로
-            failureThreshold: 6       # 최대 30s(5*6)까지 기다림
           env:
-
-            # ---- OTel Java agent 붙이기
-            - name: JAVA_TOOL_OPTIONS
-              value: >-
-                -javaagent:/otel/opentelemetry-javaagent.jar
-                -Dlogging.config=/opt/logcfg/logback-spring.xml
-                -Dmanagement.endpoints.web.exposure.include=health,prometheus
-                -Dmanagement.endpoint.health.probes.enabled=true
-                -Dmanagement.health.probes.enabled=true
-                -Dmanagement.server.port=8080
-
-            - name: SPRING_CONFIG_ADDITIONAL_LOCATION
-              value: "file:/opt/logcfg/"
-
-            # ---- 서비스명
+            # ----- 공통 식별 -----
             - name: OTEL_SERVICE_NAME
-              value: spring-petclinic
+              value: "brokentelephone-java"
 
-            # ---- OTLP gRPC → Alloy(ClusterIP)
-            - name: OTEL_EXPORTER_OTLP_PROTOCOL
-              value: grpc
-            - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: http://alloy.observability.svc.cluster.local:4317
-
-            # ---- 어떤 신호를 보낼지
+            # ----- Trace -----
             - name: OTEL_TRACES_EXPORTER
-              value: otlp
-            - name: OTEL_LOGS_EXPORTER
-              value: otlp
-            - name: OTEL_METRICS_EXPORTER
-              value: none
+              value: "otlp"
             - name: OTEL_TRACES_SAMPLER
-              value: always_on
+              value: "parentbased_always_on" # 테스트 시 전량 샘플링
 
-            # ---- 로그 상관관계(MDC) 활성화
-            - name: OTEL_INSTRUMENTATION_LOGBACK_MDC_ENABLED
+            # ----- Logs -----
+            - name: OTEL_LOGS_EXPORTER
+              value: "otlp"
+
+            # ----- Metrics (Prometheus exporter 노출 → Alloy가 scrape) -----
+            - name: OTEL_METRICS_EXPORTER
+              value: "prometheus"
+            - name: OTEL_EXPORTER_PROMETHEUS_PORT
+              value: "9464"
+            # (선택) 트레이스 기반 엑셈플러로 Metrics→Traces 점프
+            - name: OTEL_METRICS_EXEMPLAR_FILTER
+              value: "trace_based"
+
+            # ----- OTLP Export 대상: Alloy(관측 네임스페이스 주의) -----
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "alloy.observability.svc.cluster.local:4317"
+            - name: OTEL_EXPORTER_OTLP_INSECURE
               value: "true"
-            # ---- Spring Boot 로깅을 확실히 패턴 적용 (console + level)
-            - name: SPRING_APPLICATION_JSON
-              value: |
-                {
-                  "server": { "port": 8080, "address": "0.0.0.0" },
-                  "logging": {
-                    "level": { "root": "INFO" },
-                    "pattern": {
-                      "console": "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger - %msg trace_id=%X{trace_id} span_id=%X{span_id}%n"
-                    }
-                  }
-                }
 
-        # 간단한 로드 제너레이터(주기적으로 요청해서 trace/MDC가 생기도록)
-        - name: ping
-          image: curlimages/curl:8.9.1
-          command: ["sh","-ceu"]
-          args:
-            - |
-              echo "Waiting for HTTP 200 from app:8080 ..."
-              until curl -fsS http://127.0.0.1:8080/ >/dev/null; do
-                sleep 1
-              done
-              echo "App is ready. Start periodic pings."
-              while true; do
-                if curl -fsS http://127.0.0.1:8080/ >/dev/null; then
-                  echo "$(date -Is) ping OK"
-                else
-                  echo "$(date -Is) ping FAIL"
-                fi
-                sleep 10
-              done
+          ports:
+            - { name: grpc, containerPort: 50051 } # 앱 gRPC (서비스 필요 시)
+            - { name: metrics, containerPort: 9464 } # Prometheus 스크랩
+          readinessProbe:
+            tcpSocket: { port: 50051 }
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          resources: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: brokentelephone-java
+  namespace: test
+  labels: { app: brokentelephone-java }
+spec:
+  selector: { app: brokentelephone-java }
+  type: ClusterIP
+  ports:
+    - { name: grpc, port: 50051, targetPort: 50051 }
+    - { name: metrics, port: 9464, targetPort: 9464 }
