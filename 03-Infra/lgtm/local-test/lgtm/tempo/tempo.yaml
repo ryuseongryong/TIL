@@ -14,8 +14,8 @@ storage:
   trace:
     backend: s3
     s3:
-      bucket: apr-monitoring-store
-      prefix: photogray/dev/traces/
+      bucket: monitoring-store
+      prefix: /dev/traces/
       endpoint: https://s3.ap-northeast-2.amazaonaws.com
       region: ap-northeast-2
 compactor:
@@ -28,9 +28,9 @@ metrics_generator:
   storage:
     path: /var/tempo/metrics-generator
     remote_write:
-      - url: http://127.0.0.1:9009/api/v1/push   # Mimir remote_write 엔드포인트
+      - url: http://127.0.0.1:9009/api/v1/push # Mimir remote_write 엔드포인트
         headers:
-          X-Scope-OrgID: minikube                     # 테넌트 헤더(멀티테넌시일 때)
+          X-Scope-OrgID: minikube # 테넌트 헤더(멀티테넌시일 때)
   registry:
     external_labels:
       source: tempo

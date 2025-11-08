@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: pg-admin-api
-          image: 688814567323.dkr.ecr.ap-northeast-2.amazonaws.com/photogray-admin-api-dev:local-test-amd64
+          image: 688814567323.dkr.ecr.ap-northeast-2.amazonaws.com/-admin-api-dev:local-test-amd64
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
