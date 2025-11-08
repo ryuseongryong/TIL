@@ -1,0 +1,68 @@
+apiVersion: 1
+datasources:
+  - name: Mimir
+    type: prometheus
+    access: proxy
+    url: http://192.168.100.36:9009/prometheus
+    isDefault: true
+    jsonData:
+      httpHeaderName1: X-Scope-OrgID
+    secureJsonData:
+      httpHeaderValue1: minikube
+    editable: true
+  - name: Tempo
+    type: tempo
+    access: proxy
+    url: http://192.168.100.36:3200
+    secureJsonData:
+      httpHeaderValue1: minikube
+    jsonData:
+      httpHeaderName1: X-Scope-OrgID
+      tracesToLogsV2:
+        datasourceUid: 'Loki'
+        spanStartTimeShift: '-1h'
+        spanEndTimeShift: '1h'
+        tags: ['job', 'instance', 'pod', 'namespace']
+        filterByTraceID: false
+        filterBySpanID: false
+        customQuery: true
+        query: 'method="$${__span.tags.method}"'
+      tracesToMetrics:
+        datasourceUid: 'Mimir'
+        spanStartTimeShift: '-1h'
+        spanEndTimeShift: '1h'
+        tags: [{ key: 'service.name', value: 'service' }, { key: 'job' }]
+        queries:
+          - name: 'Sample query'
+            query: 'sum(rate(traces_spanmetrics_latency_bucket{$$__tags}[5m]))'
+      serviceMap:
+        datasourceUid: 'Mimir'
+      nodeGraph:
+        enabled: true
+      search:
+        hide: false
+      traceQuery:
+        timeShiftEnabled: true
+        spanStartTimeShift: '-1h'
+        spanEndTimeShift: '1h'
+      spanBar:
+        type: 'Tag'
+        tag: 'http.path'
+      streamingEnabled:
+        search: true
+    editable: true
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://192.168.100.36:3100
+    secureJsonData:
+      httpHeaderValue1: minikube
+    jsonData:
+      httpHeaderName1: X-Scope-OrgID
+      derivedFields:
+        - datasourceUid: Tempo
+          matcherRegex: "traceID=(\\w+)"
+          name: TraceID
+          url: '$${__value.raw}'
+          urlDisplayLabel: 'View Trace'
+    editable: true

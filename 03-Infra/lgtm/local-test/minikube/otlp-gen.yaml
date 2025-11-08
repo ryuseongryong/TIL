@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telemetrygen-otlp
+  labels:
+    app: telemetrygen-otlp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: telemetrygen-otlp
+  template:
+    metadata:
+      labels:
+        app: telemetrygen-otlp
+    spec:
+      containers:
+      - name: tg
+        image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:latest
+        args:
+          # OTLP gRPC로 Alloy에 전송, 무제한(duration=0 → 무한), 초당 5라인
+          - logs
+          - --otlp-insecure
+          - --otlp-endpoint=alloy.observability.svc.cluster.local:4317
+#          - --duration=0
+          - --rate=5
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+      restartPolicy: Always
+

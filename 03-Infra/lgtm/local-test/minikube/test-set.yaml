@@ -1,0 +1,144 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shopper
+  labels: { app: shopper }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: shopper }
+  template:
+    metadata:
+      labels: { app: shopper }
+    spec:
+      terminationGracePeriodSeconds: 1
+      containers:
+        - name: shopper
+          image: codeboten/shopper:chapter2
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: grpc
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://alloy.observability.svc.cluster.local:4317
+            - name: OTEL_EXPORTER_OTLP_INSECURE
+              value: "true"
+            - name: GROCERY_STORE_URL
+              value: "http://grocery-store:5000/products"
+          # # readinessProbe가 있으면 의존 서비스 준비 전 트래픽을 막을 수 있습니다.
+          # readinessProbe:
+          #   tcpSocket: { port: 8080 }
+          #   initialDelaySeconds: 3
+          #   periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shopper
+  labels: { app: shopper }
+spec:
+  selector: { app: shopper }
+  # 외부 노출 불필요 시 ClusterIP 유지
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grocery-store
+  labels: { app: grocery-store }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: grocery-store }
+  template:
+    metadata:
+      labels: { app: grocery-store }
+    spec:
+      terminationGracePeriodSeconds: 1
+      containers:
+        - name: grocery-store
+          image: codeboten/grocery-store:chapter2
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: grpc
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://alloy.observability.svc.cluster.local:4317
+            - name: OTEL_SERVICE_NAME
+              value: "grocery-store"
+            - name: INVENTORY_URL
+              value: "http://legacy-inventory:5001/inventory"
+          ports:
+            - name: http
+              containerPort: 5000
+          readinessProbe:
+            tcpSocket: { port: 5000 }
+            initialDelaySeconds: 3
+            periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grocery-store
+  labels: { app: grocery-store }
+spec:
+  selector: { app: grocery-store }
+  # 외부 접근 필요하면 NodePort 유지, 내부만이면 ClusterIP로 변경
+  type: NodePort
+  ports:
+    - name: http
+      port: 5000
+      targetPort: 5000
+      nodePort: 30050
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: legacy-inventory
+  labels: { app: legacy-inventory }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: legacy-inventory }
+  template:
+    metadata:
+      labels: { app: legacy-inventory }
+    spec:
+      terminationGracePeriodSeconds: 1
+      containers:
+        - name: legacy-inventory
+          image: codeboten/legacy-inventory:chapter2
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: grpc
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://alloy.observability.svc.cluster.local:4317
+            - name: OTEL_SERVICE_NAME
+              value: "inventory"
+          ports:
+            - name: http
+              containerPort: 5001
+          readinessProbe:
+            tcpSocket: { port: 5001 }
+            initialDelaySeconds: 3
+            periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: legacy-inventory
+  labels: { app: legacy-inventory }
+spec:
+  selector: { app: legacy-inventory }
+  # 외부 접근 필요하면 NodePort 유지, 내부만이면 ClusterIP로 변경
+  type: NodePort
+  ports:
+    - name: http
+      port: 5001
+      targetPort: 5001
+      nodePort: 30051

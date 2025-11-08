@@ -1,0 +1,45 @@
+server:
+  http_listen_port: 3100
+
+common:
+  path_prefix: /loki
+  replication_factor: 1
+  storage:
+    filesystem:
+      chunks_directory: /loki/chunks
+      rules_directory: /loki/rules
+  ring:
+    kvstore:
+      store: memberlist   # Consul 대신 memberlist
+
+memberlist:
+  join_members:
+    - 127.0.0.1          # 단일 노드면 로컬 조인
+
+schema_config:
+  configs:
+    - from: 2025-01-01
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h
+
+# ▼ 여기부터 변경/추가
+limits_config:
+  allow_structured_metadata: true    # tsdb에서 OK
+  ingestion_rate_mb: 20              # (글로벌 기본) 테넌트당 초당 20 MiB
+  ingestion_burst_size_mb: 40        # 버스트 40 MiB
+  per_stream_rate_limit: 5MB         # 스트림당 초당 5 MiB
+  per_stream_rate_limit_burst: 10MB  # 스트림당 버스트 10 MiB
+# ▲ 여기까지 변경/추가
+
+query_range:
+  parallelise_shardable_queries: true
+
+ruler:
+  enable_api: true
+
+tracing:
+  enabled: true

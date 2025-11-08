@@ -1,0 +1,57 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tg-metrics
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: tg
+        image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:latest
+        args:
+          - metrics
+          - --otlp-endpoint=alloy.observability.svc.cluster.local:4317
+          - --otlp-insecure
+          - --duration=60s
+          - --rate=5
+          - --service=telemetrygen-metrics
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tg-logs
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: tg
+        image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:latest
+        args:
+          - logs
+          - --otlp-endpoint=alloy.observability.svc.cluster.local:4317
+          - --otlp-insecure
+          - --duration=60s
+          - --rate=5
+          - --service=telemetrygen-logs
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tg-traces
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: tg
+        image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:latest
+        args:
+          - traces
+          - --otlp-endpoint=alloy.observability.svc.cluster.local:4317
+          - --otlp-insecure
+          - --duration=60s
+          - --rate=5
+          - --service=telemetrygen-traces
+

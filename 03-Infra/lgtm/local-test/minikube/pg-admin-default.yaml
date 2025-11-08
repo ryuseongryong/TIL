@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pg-admin-api-local-test
+  namespace: logging-test
+  labels: { app: pg-admin-api-local-test }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: pg-admin-api-local-test } }
+  template:
+    metadata:
+      labels: { app: pg-admin-api-local-test }
+    spec:
+      containers:
+        - name: pg-admin-api
+          image: 688814567323.dkr.ecr.ap-northeast-2.amazonaws.com/-admin-api-dev:local-test-amd64
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          # env:
+          #   # ---- OTel Java agent
+          #   - name: JAVA_TOOL_OPTIONS
+          #     value: >-
+          #       -javaagent:/otel/opentelemetry-javaagent.jar
+          #       -Dmanagement.endpoints.web.exposure.include=health,prometheus
+          #       -Dmanagement.endpoint.health.probes.enabled=true
+          #       -Dmanagement.health.probes.enabled=true
+          #       -Dmanagement.server.port=8080
+
+          #   # ---- OTel 기본 설정
+          #   - name: OTEL_SERVICE_NAME
+          #     value: spring-petclinic
+          #   - name: OTEL_EXPORTER_OTLP_PROTOCOL
+          #     value: grpc
+          #   - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          #     value: http://alloy.observability.svc.cluster.local:4317
+          #   - name: OTEL_TRACES_EXPORTER
+          #     value: otlp
+          #   - name: OTEL_LOGS_EXPORTER
+          #     value: otlp
+          #   - name: OTEL_METRICS_EXPORTER
+          #     value: none
+          #   - name: OTEL_TRACES_SAMPLER
+          #     value: always_on
+
+          #   # ---- Logback MDC 주입 ON
+          #   - name: OTEL_INSTRUMENTATION_LOGBACK_MDC_ENABLED
+          #     value: "true"
+
+          #   # (옵션) 에이전트 부팅 로그 상세
+          #   # - name: OTEL_JAVAAGENT_DEBUG
+          #   #   value: "true"

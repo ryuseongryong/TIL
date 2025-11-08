@@ -1,0 +1,342 @@
+# ---- basics ----
+nameOverride: alloy
+namespaceOverride: observability
+fullnameOverride: null
+
+global:
+  image:
+    registry: ""     # 기본(docker.io) 그대로
+  podSecurityContext: {}
+
+crds:
+  create: true
+
+# ---- controller: DaemonSet 하나로 통합 ----
+controller:
+  type: "daemonset"
+  podAnnotations: {}
+  podLabels: {}
+  nodeSelector: {}
+  tolerations: []
+  topologySpreadConstraints: []
+
+serviceAccount:
+  create: true
+
+rbac:
+  create: true
+
+# ---- 로그 수집을 위한 hostPath 마운트 ----
+alloy:
+  mounts:
+    varlog: true
+    dockercontainers: true
+    extra: []   # 필요 시 추가
+  securityContext:
+    runAsUser: 0
+
+  # Alloy 내부 HTTP(상태/메트릭 UI) 활성화
+  enableHttpServerPort: true
+  listenAddr: 0.0.0.0
+  listenPort: 12345
+  listenScheme: HTTP
+  uiPathPrefix: /
+
+  # OTLP 포트(Service로 노출)
+  extraPorts:
+    - name: otlp-grpc
+      port: 4317
+      targetPort: 4317
+      protocol: TCP
+      appProtocol: h2c
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
+      protocol: TCP
+
+  # 리소스/보안 등 필요시 추가
+  resources: {}
+  securityContext: {}
+
+  # ---- 핵심: Flow 구성 ----
+  configMap:
+    create: true
+    content: |
+      // ─────────────────────────────────────────────────────────────
+      // 0) Logging (Alloy 자체 로그 출력 형식/레벨)
+      // ─────────────────────────────────────────────────────────────
+      logging {
+        level  = "info"
+        format = "logfmt"
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      // 1) Metrics 수집 (Prometheus Scrape → Mimir Remote Write)
+      //    - Pod annotation 기반 scrape
+      //    - OTLP 포트(4317/4318)는 제외
+      // ─────────────────────────────────────────────────────────────
+      discovery.kubernetes "pods" {
+        role = "pod"
+      }
+
+      discovery.relabel "pod_scrape" {
+        targets = discovery.kubernetes.pods.targets
+
+        rule {
+          action        = "keep"
+          source_labels = ["__meta_kubernetes_pod_annotation_prometheus_io_scrape"]
+          regex         = "true"
+        }
+        rule {
+          action        = "replace"
+          source_labels = ["__meta_kubernetes_pod_annotation_prometheus_io_scheme"]
+          target_label  = "__scheme__"
+          regex         = "(https?)"
+        }
+        rule {
+          action        = "replace"
+          source_labels = ["__meta_kubernetes_pod_annotation_prometheus_io_path"]
+          target_label  = "__metrics_path__"
+          regex         = "(.+)"
+        }
+        rule {
+          action        = "replace"
+          source_labels = ["__address__", "__meta_kubernetes_pod_annotation_prometheus_io_port"]
+          target_label  = "__address__"
+          regex         = "([^:]+)(?::\\d+)?;(\\d+)"
+          replacement   = "$1:$2"
+        }
+        rule {
+          action        = "drop"
+          source_labels = ["__address__"]
+          regex         = ".+:(4317|4318)"
+        }
+      }
+
+      prometheus.scrape "kube" {
+        targets    = discovery.relabel.pod_scrape.output
+        forward_to = [prometheus.remote_write.mimir.receiver]
+      }
+
+      prometheus.remote_write "mimir" {
+        endpoint {
+          url     = "http://192.168.100.36:9009/api/v1/push"
+          headers = { "X-Scope-OrgID" = "minikube" }
+        }
+        external_labels = { cluster = "minikube", env = "dev" }
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      // 2) Logs (OTLP 경로)
+      //    - 앱/SDK/Collector → Alloy(OTLP Receiver)
+      //    - k8sattributes로 메타데이터 주입
+      //    - attributes processor로 라벨 승격
+      //    - Loki exporter → normalize → Loki write
+      // ─────────────────────────────────────────────────────────────
+      loki.write "main" {
+        endpoint {
+          url     = "http://192.168.100.36:3100/loki/api/v1/push"
+          headers = { "X-Scope-OrgID" = "minikube" }
+        }
+        external_labels = { cluster = "minikube", env = "dev" }
+      }
+
+      loki.process "normalize_otlp" {
+        stage.labels {
+          values = {
+            pod       = "{{ or .pod .k8s_pod_name }}",
+            namespace = "{{ or .namespace .k8s_namespace_name }}",
+            container = "{{ or .container .k8s_container_name }}",
+          }
+        }
+        forward_to = [loki.write.main.receiver]
+      }
+
+      otelcol.exporter.loki "default" {
+        forward_to = [loki.process.normalize_otlp.receiver]
+      }
+
+      otelcol.processor.attributes "loki_labels" {
+        action {
+          key    = "loki.resource.labels"
+          action = "upsert"
+          value  = "k8s.namespace.name,k8s.pod.name,k8s.container.name,service.name"
+        }
+
+        action {
+          key    = "loki.attribute.labels"
+          action = "upsert"
+          value  = "trace_id,span_id,severity"
+        }
+
+
+        output {
+          logs = [otelcol.exporter.loki.default.input]
+        }
+      }
+
+      otelcol.processor.k8sattributes "logs" {
+        auth_type = "serviceAccount"
+
+        pod_association { 
+          source { 
+            from = "connection" 
+          } 
+        }
+        pod_association {
+          source { 
+            from = "resource_attribute" 
+            name = "k8s.pod.ip" 
+          } 
+        }
+        pod_association { 
+          source { 
+            from = "resource_attribute" 
+            name = "ip" 
+          } 
+        }
+
+        extract {
+          metadata = [
+            "k8s.namespace.name",
+            "k8s.pod.name",
+            "k8s.container.name",
+            "k8s.node.name",
+            "k8s.pod.uid",
+            "k8s.pod.start_time",
+          ]
+        }
+        output {
+          logs = [otelcol.processor.attributes.loki_labels.input]
+        }
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      // 3) Logs (File Tail 경로: /var/log/containers/*.log)
+      //    - 기본 CRI parsing
+      //    - default 네임스페이스는 드롭 (OTLP만 허용)
+      // ─────────────────────────────────────────────────────────────
+
+      local.file_match "logs" {
+        path_targets = [
+          { __path__ = "/var/log/containers/*.log"},
+          { __path__ = "/var/log/pods/*/*/*.log"},
+        ]
+      }
+
+      loki.source.file "containers" {
+        targets    = local.file_match.logs.targets
+        forward_to = [loki.relabel.k8s_from_filename.receiver]
+      }
+
+      loki.process "kube" {
+        stage.cri {}
+
+        // 파일 테일도 Explore에서 k8s_* 라벨로 검색할 수 있도록 정규화
+        stage.labels {
+          values = {
+            k8s_pod_name        = "{{ .pod }}",
+            k8s_namespace_name  = "{{ .namespace }}",
+            k8s_container_name  = "{{ .container }}",
+          }
+        }
+
+        // default 네임스페이스는 파일 테일에서 제외 (OTLP만 허용)
+        stage.match {
+          selector = "{namespace=~\"(test)\"}"
+          action   = "drop"
+        }
+
+        stage.static_labels {
+          values = { cluster = "minikube", env = "dev" }
+        }
+        forward_to = [loki.write.main.receiver]
+      }
+
+      loki.relabel "k8s_from_filename" {
+        // filename = /var/log/containers/pod_namespace_container-<id>.log
+
+        // k8s_pod_name
+        rule {
+          source_labels = ["filename"]
+          regex         = ".*/([^_]+)_[^_]+_[^-]+-.*\\.log"
+          target_label  = "k8s_pod_name"
+          replacement   = "$1"
+        }
+
+        // k8s_namespace_name
+        rule {
+          source_labels = ["filename"]
+          regex         = ".*/[^_]+_([^_]+)_[^-]+-.*\\.log"
+          target_label  = "k8s_namespace_name"
+          replacement   = "$1"
+        }
+
+        // k8s_container_name
+        rule {
+          source_labels = ["filename"]
+          regex         = ".*/[^_]+_[^_]+_([^-]+)-.*\\.log"
+          target_label  = "k8s_container_name"
+          replacement   = "$1"
+        }
+
+        // (정책) default 네임스페이스는 파일 테일에서 제외(= OTLP만)
+        rule {
+          source_labels = ["k8s_namespace_name"]
+          regex         = "default"
+          action        = "drop"
+        }
+
+        forward_to = [loki.process.kube.receiver]
+      }
+      // ─────────────────────────────────────────────────────────────
+      // 4) Prometheus exporter (OTLP Metrics → Remote Write)
+      // ─────────────────────────────────────────────────────────────
+      otelcol.exporter.prometheus "default" {
+        forward_to = [prometheus.remote_write.mimir.receiver]
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      // 5) Traces (OTLP → Tempo)
+      // ─────────────────────────────────────────────────────────────
+      otelcol.exporter.otlphttp "tempo" {
+        client { endpoint = "http://192.168.100.36:4318" }
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      // 6) OTLP Receiver (앱/SDK/Collector → Alloy)
+      // ─────────────────────────────────────────────────────────────
+      otelcol.receiver.otlp "ingest" {
+        http {}
+        grpc {}
+        output {
+          metrics = [otelcol.exporter.prometheus.default.input]
+          traces  = [otelcol.exporter.otlphttp.tempo.input]
+          logs    = [otelcol.processor.k8sattributes.logs.input]
+        }
+      }
+image:
+  registry: "docker.io"
+  repository: grafana/alloy
+  tag: null
+  pullPolicy: IfNotPresent
+
+configReloader:
+  enabled: true
+  image:
+    registry: "quay.io"
+    repository: prometheus-operator/prometheus-config-reloader
+    tag: v0.81.0
+
+service:
+  enabled: true
+  type: ClusterIP
+  # ClusterIP로 otlp-grpc/otlp-http/12345가 노출됩니다.
+
+serviceMonitor:
+  enabled: false
+
+ingress:
+  enabled: false
+
+extraObjects: []

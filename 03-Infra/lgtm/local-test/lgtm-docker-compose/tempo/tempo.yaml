@@ -1,0 +1,46 @@
+server:
+  http_listen_port: 3200
+  grpc_listen_port: 9095
+  log_level: info
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc: { endpoint: 0.0.0.0:4317 }
+        http: { endpoint: 0.0.0.0:4318 }
+
+storage:
+  trace:
+    backend: local
+    local:
+      path: /var/tempo/traces
+
+compactor:
+  compaction:
+    block_retention: 168h
+
+# 🔴 (필수) metrics-generator 저장/전송/프로세서 설정
+metrics_generator:
+  # 로컬 워킹 디렉터리 없으면 모듈이 비활성화됩니다.
+  storage:
+    path: /var/tempo/metrics-generator
+    remote_write:
+      - url: http://192.168.100.36:9009/api/v1/push   # Mimir remote_write 엔드포인트
+        headers:
+          X-Scope-OrgID: minikube                     # 테넌트 헤더(멀티테넌시일 때)
+  registry:
+    external_labels:
+      source: tempo
+
+# 🔴 (필수) 테넌트별로 프로세서 활성(기본값은 꺼짐)
+overrides:
+  defaults:
+    metrics_generator:
+      processors: ["service-graphs", "span-metrics"]
+
+# 🟠 (권장) 단일 바이너리라도 링 확인을 위해 memberlist 선언
+memberlist:
+  join_members: ["127.0.0.1"]
+
+stream_over_http_enabled: true

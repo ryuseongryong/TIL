@@ -1,0 +1,37 @@
+server:
+  http_listen_port: 9009
+common:
+  storage:
+    backend: filesystem
+    filesystem:
+      dir: /data
+blocks_storage:
+  backend: filesystem
+  filesystem:
+    dir: /data/blocks
+ruler:
+  enable_api: true
+  ring:
+    kvstore:
+      store: memberlist
+# 단일/로컬용 권장 공통 설정
+distributor:
+  ring:
+    kvstore:
+      store: memberlist
+
+ingester:
+  ring:
+    kvstore:
+      store: memberlist
+    replication_factor: 1   # ★ 단일 노드이므로 1
+
+alertmanager:
+  sharding_ring:
+    kvstore:
+      store: memberlist
+
+store_gateway:
+  sharding_ring:
+    kvstore:
+      store: memberlist

@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: brokentelephone-java
+  namespace: test
+  labels: { app: brokentelephone-java }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: brokentelephone-java }
+  template:
+    metadata:
+      labels: { app: brokentelephone-java }
+      annotations:
+        # ── Alloy가 Prometheus 방식으로 스크레이프하도록 Pod에 주석
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9464"
+        prometheus.io/path: "/metrics"
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+        - name: app
+          image: brokentelephone:java
+          imagePullPolicy: IfNotPresent
+          env:
+            # ----- 공통 식별 -----
+            - name: OTEL_SERVICE_NAME
+              value: "brokentelephone-java"
+
+            # ----- Trace -----
+            - name: OTEL_TRACES_EXPORTER
+              value: "otlp"
+            - name: OTEL_TRACES_SAMPLER
+              value: "parentbased_always_on" # 테스트 시 전량 샘플링
+
+            # ----- Logs -----
+            - name: OTEL_LOGS_EXPORTER
+              value: "otlp"
+
+            # ----- Metrics (Prometheus exporter 노출 → Alloy가 scrape) -----
+            - name: OTEL_METRICS_EXPORTER
+              value: "prometheus"
+            - name: OTEL_EXPORTER_PROMETHEUS_PORT
+              value: "9464"
+            # (선택) 트레이스 기반 엑셈플러로 Metrics→Traces 점프
+            - name: OTEL_METRICS_EXEMPLAR_FILTER
+              value: "trace_based"
+
+            # ----- OTLP Export 대상: Alloy(관측 네임스페이스 주의) -----
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "alloy.observability.svc.cluster.local:4317"
+            - name: OTEL_EXPORTER_OTLP_INSECURE
+              value: "true"
+
+          ports:
+            - { name: grpc, containerPort: 50051 } # 앱 gRPC (서비스 필요 시)
+            - { name: metrics, containerPort: 9464 } # Prometheus 스크랩
+          readinessProbe:
+            tcpSocket: { port: 50051 }
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          resources: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: brokentelephone-java
+  namespace: test
+  labels: { app: brokentelephone-java }
+spec:
+  selector: { app: brokentelephone-java }
+  type: ClusterIP
+  ports:
+    - { name: grpc, port: 50051, targetPort: 50051 }
+    - { name: metrics, port: 9464, targetPort: 9464 }

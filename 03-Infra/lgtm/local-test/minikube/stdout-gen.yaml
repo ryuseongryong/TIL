@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: loggen-file-drop
+  labels:
+    app: loggen-file-drop
+spec:
+  containers:
+  - name: logger
+    image: busybox
+    command: ['sh','-c','i=0; while true; do echo "file-log drop: $i"; i=$((i+1)); sleep 1; done']
+  restartPolicy: Always
+
